@@ -43,3 +43,17 @@ export async function removeUnusedUploads(candidates: string[], projects: Projec
     await unlink(path.join(UPLOAD_DIR, name)).catch(() => {});
   }
 }
+
+// Records an admin change in Git (see scripts/auto-commit.mjs). Only the
+// project list and uploaded images are committed, never other work in
+// progress. A failure here never stops the save itself.
+export async function commitAdminChange(message: string) {
+  const { execFile } = await import("node:child_process");
+  const script = path.join(process.cwd(), "scripts", "auto-commit.mjs");
+  await new Promise<void>((done) =>
+    execFile(process.execPath, [script, "--message", message, "--only", "src/data/projects.json", "public/images/work/uploads"], { cwd: process.cwd() }, (error, _out, err) => {
+      if (error) console.warn("Admin: couldn't record the change in Git.", err || error.message);
+      done();
+    }),
+  );
+}

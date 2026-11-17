@@ -1,7 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { adminEnabled, endSession, isSignedIn, passwordMatches, startSession } from "@/lib/admin/auth";
-import { readProjects, removeUnusedUploads, saveUpload, writeProjects } from "@/lib/admin/store";
+import { commitAdminChange, readProjects, removeUnusedUploads, saveUpload, writeProjects } from "@/lib/admin/store";
 import { deviceOf, platforms, type Device, type Platform, type Project, type Shot } from "@/data/site";
 
 export type FormState = {
@@ -112,6 +112,7 @@ export async function saveProject(_: FormState, form: FormData): Promise<FormSta
   const next = existing ? projects.map((p) => (p === existing ? project : p)) : [project, ...projects];
   await writeProjects(next);
   await removeUnusedUploads((existing?.shots ?? []).map((s) => s.src), next);
+  await commitAdminChange(existing ? `Admin: updated ${title}` : `Admin: added ${title}`);
 
   return { ok: true, slug, message: existing ? "Changes saved." : "Project added." };
 }
@@ -124,6 +125,7 @@ export async function deleteProject(slug: string): Promise<FormState> {
   const next = projects.filter((p) => p !== target);
   await writeProjects(next);
   await removeUnusedUploads(target.shots.map((s) => s.src), next);
+  await commitAdminChange(`Admin: deleted ${target.title}`);
   return { ok: true, message: `Deleted ${target.title}.` };
 }
 
@@ -135,5 +137,6 @@ export async function moveProject(slug: string, direction: -1 | 1): Promise<Form
   if (i < 0 || j < 0 || j >= projects.length) return { ok: true };
   [projects[i], projects[j]] = [projects[j], projects[i]];
   await writeProjects(projects);
+  await commitAdminChange(`Admin: moved ${projects[j].title} ${direction < 0 ? "up" : "down"}`);
   return { ok: true };
 }
