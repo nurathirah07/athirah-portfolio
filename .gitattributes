@@ -1,0 +1,13 @@
+# Keep line endings consistent (LF) in the repository on every computer.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.mp4 binary
+*.wav binary
+*.bin binary
+*.ttf binary
+*.otf binary
+*.ico binary

@@ -1,0 +1,423 @@
+[
+  {
+    "slug": "cozy-crumb",
+    "title": "Cozy Crumb",
+    "year": "2025",
+    "kind": "Academic Project",
+    "summary": "A bakery shop and back office in one. Customers order and track in real time, while sellers manage products, stock and sales.",
+    "tech": [
+      "Java",
+      "JSP",
+      "Servlets",
+      "MySQL",
+      "Tomcat"
+    ],
+    "platform": "web",
+    "shots": [
+      {
+        "src": "/images/work/uploads/cozy-crumb-f7617217.webp",
+        "width": 1600,
+        "height": 891,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-4b14def0.webp",
+        "width": 1600,
+        "height": 901,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-2d304b55.webp",
+        "width": 1600,
+        "height": 883,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-73ef184d.webp",
+        "width": 1600,
+        "height": 897,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-2985c11c.webp",
+        "width": 1600,
+        "height": 887,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-ba29243f.webp",
+        "width": 1600,
+        "height": 889,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-408fa606.webp",
+        "width": 1600,
+        "height": 896,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-944a524f.webp",
+        "width": 1600,
+        "height": 889,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-a1d581d2.webp",
+        "width": 1600,
+        "height": 887,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-73d1ced9.webp",
+        "width": 1600,
+        "height": 887,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-a911491b.webp",
+        "width": 1600,
+        "height": 898,
+        "alt": "Cozy Crumb screenshot"
+      },
+      {
+        "src": "/images/work/uploads/cozy-crumb-8471c498.webp",
+        "width": 1600,
+        "height": 536,
+        "alt": "Cozy Crumb screenshot"
+      }
+    ]
+  },
+  {
+    "slug": "rentngo",
+    "title": "RentNGo",
+    "year": "2025",
+    "kind": "Academic Project",
+    "summary": "Car rental booking with no double bookings, thanks to real-time availability checks, plus secure login and an admin dashboard.",
+    "tech": [
+      "PHP",
+      "JavaScript",
+      "MySQL"
+    ],
+    "platform": "web",
+    "shots": [
+      {
+        "src": "/images/work/uploads/rentngo-11ecc0e5.webp",
+        "width": 1600,
+        "height": 888,
+        "alt": "RentNGo screenshot"
+      },
+      {
+        "src": "/images/work/uploads/rentngo-8a709922.webp",
+        "width": 1600,
+        "height": 888,
+        "alt": "RentNGo screenshot"
+      },
+      {
+        "src": "/images/work/uploads/rentngo-554e0321.webp",
+        "width": 1600,
+        "height": 891,
+        "alt": "RentNGo screenshot"
+      },
+      {
+        "src": "/images/work/uploads/rentngo-50bf2618.webp",
+        "width": 1600,
+        "height": 885,
+        "alt": "RentNGo screenshot"
+      }
+    ],
+    "link": "https://rentngo-car-booking-system-production-il8hvq.laravel.cloud/"
+  },
+  {
+    "slug": "biteright",
+    "title": "BiteRight",
+    "year": "2026",
+    "kind": "Final Year Project",
+    "summary": "Scan an ingredient label and this mobile app warns you about allergens that matter to your own diet.",
+    "tech": [
+      "Flutter",
+      "Flask",
+      "Firestore",
+      "OCR",
+      "NLP",
+      "scikit-learn"
+    ],
+    "platform": "mobile",
+    "shots": [
+      {
+        "src": "/images/work/uploads/biteright-22a3701e.webp",
+        "width": 577,
+        "height": 1163,
+        "alt": "BiteRight screenshot"
+      },
+      {
+        "src": "/images/work/uploads/biteright-dd31d892.webp",
+        "width": 621,
+        "height": 1253,
+        "alt": "BiteRight screenshot"
+      },
+      {
+        "src": "/images/work/uploads/biteright-a85b2386.webp",
+        "width": 584,
+        "height": 1176,
+        "alt": "BiteRight screenshot"
+      },
+      {
+        "src": "/images/work/uploads/biteright-629f9223.webp",
+        "width": 621,
+        "height": 1257,
+        "alt": "BiteRight screenshot"
+      },
+      {
+        "src": "/images/work/uploads/biteright-416acd36.webp",
+        "width": 618,
+        "height": 1248,
+        "alt": "BiteRight screenshot"
+      },
+      {
+        "src": "/images/work/uploads/biteright-5a892ba2.webp",
+        "width": 575,
+        "height": 1172,
+        "alt": "BiteRight screenshot"
+      },
+      {
+        "src": "/images/work/uploads/biteright-a0430f26.webp",
+        "width": 577,
+        "height": 1163,
+        "alt": "BiteRight screenshot"
+      }
+    ]
+  },
+  {
+    "slug": "hq-inventory",
+    "title": "HQ Inventory System",
+    "year": "2026",
+    "kind": "Internship",
+    "summary": "One place to see stock across every branch and store, with POS sales, staff roles, damage reports and activity logs built in.",
+    "tech": [
+      "Node.js",
+      "React",
+      "Tailwind CSS"
+    ],
+    "platform": "web",
+    "shots": [
+      {
+        "src": "/images/work/hq-dashboard.webp",
+        "width": 1600,
+        "height": 883,
+        "alt": "HQ Inventory overview dashboard"
+      },
+      {
+        "src": "/images/work/hq-login.webp",
+        "width": 958,
+        "height": 762,
+        "alt": "HQ Inventory sign-in screen"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-973fad05.webp",
+        "width": 948,
+        "height": 762,
+        "alt": "HQ Inventory System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-47df1976.webp",
+        "width": 942,
+        "height": 852,
+        "alt": "HQ Inventory System screenshot"
+      },
+      {
+        "src": "/images/work/hq-stock.webp",
+        "width": 466,
+        "height": 491,
+        "alt": "HQ Inventory adjust stock dialog"
+      },
+      {
+        "src": "/images/work/hq-pos.webp",
+        "width": 1047,
+        "height": 697,
+        "alt": "HQ Inventory point of sale screen"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-d267a220.webp",
+        "width": 1039,
+        "height": 954,
+        "alt": "HQ Inventory System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-8379e529.webp",
+        "width": 1029,
+        "height": 704,
+        "alt": "HQ Inventory System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-1b33d024.webp",
+        "width": 1011,
+        "height": 470,
+        "alt": "HQ Inventory System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-d561c309.webp",
+        "width": 1024,
+        "height": 966,
+        "alt": "HQ Inventory System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/hq-inventory-e082a4c9.webp",
+        "width": 1095,
+        "height": 967,
+        "alt": "HQ Inventory System screenshot"
+      }
+    ]
+  },
+  {
+    "slug": "nrts",
+    "title": "NEKO Repair Tracking System",
+    "year": "2026",
+    "kind": "Internship",
+    "summary": "A modern web app that replaces an old PowerShell desktop tool and follows every repair from device check-in to collection and payment.",
+    "tech": [
+      "Laravel",
+      "Laragon"
+    ],
+    "platform": "web",
+    "shots": [
+      {
+        "src": "/images/work/uploads/nrts-47719e05.webp",
+        "width": 1600,
+        "height": 882,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-23278722.webp",
+        "width": 1600,
+        "height": 885,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-94598a0e.webp",
+        "width": 1600,
+        "height": 872,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-737f50e7.webp",
+        "width": 1600,
+        "height": 865,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-e22cf687.webp",
+        "width": 1600,
+        "height": 861,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-a8a273bc.webp",
+        "width": 1600,
+        "height": 876,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-bab387ec.webp",
+        "width": 1600,
+        "height": 892,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-0fee3715.webp",
+        "width": 1600,
+        "height": 884,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-9dc95675.webp",
+        "width": 1600,
+        "height": 879,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-bbea8d54.webp",
+        "width": 1600,
+        "height": 883,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-f4c2027f.webp",
+        "width": 1600,
+        "height": 887,
+        "alt": "NEKO Repair Tracking System screenshot"
+      },
+      {
+        "src": "/images/work/uploads/nrts-02855069.webp",
+        "width": 1600,
+        "height": 882,
+        "alt": "NEKO Repair Tracking System screenshot"
+      }
+    ]
+  },
+  {
+    "slug": "weddingsnap",
+    "title": "WeddingSnap",
+    "year": "2026",
+    "kind": "Freelance",
+    "summary": "Developed a web-based digital wedding photography system that allows guests to capture, edit, and upload wedding photos by scanning a QR code. The system features photo frames, filters, multiple photo layouts, and Google Drive integration, allowing the newlyweds to collect and view guests' memorable moments without requiring app installation or login.",
+    "tech": [
+      "HTML",
+      "Javascript",
+      "CSS"
+    ],
+    "platform": "both",
+    "shots": [
+      {
+        "src": "/images/work/uploads/weddingsnap-8f6f8c66.webp",
+        "width": 1600,
+        "height": 881,
+        "alt": "WeddingSnap screenshot",
+        "device": "web"
+      },
+      {
+        "src": "/images/work/uploads/weddingsnap-60e26b97.webp",
+        "width": 1600,
+        "height": 882,
+        "alt": "WeddingSnap screenshot",
+        "device": "web"
+      },
+      {
+        "src": "/images/work/uploads/weddingsnap-a7da07e0.webp",
+        "width": 1600,
+        "height": 883,
+        "alt": "WeddingSnap screenshot",
+        "device": "web"
+      },
+      {
+        "src": "/images/work/uploads/weddingsnap-e242054d.webp",
+        "width": 744,
+        "height": 1280,
+        "alt": "WeddingSnap screenshot",
+        "device": "mobile"
+      },
+      {
+        "src": "/images/work/uploads/weddingsnap-1c6d11e6.webp",
+        "width": 748,
+        "height": 1280,
+        "alt": "WeddingSnap screenshot",
+        "device": "mobile"
+      },
+      {
+        "src": "/images/work/uploads/weddingsnap-ee38a561.webp",
+        "width": 748,
+        "height": 1280,
+        "alt": "WeddingSnap screenshot",
+        "device": "mobile"
+      },
+      {
+        "src": "/images/work/uploads/weddingsnap-8de123b4.webp",
+        "width": 752,
+        "height": 1280,
+        "alt": "WeddingSnap screenshot",
+        "device": "mobile"
+      }
+    ],
+    "link": "https://weddingsnap-sepia.vercel.app"
+  }
+]

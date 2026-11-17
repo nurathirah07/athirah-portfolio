@@ -1,0 +1,293 @@
+{
+  "voice": {
+    "mix": [
+      [
+        "af_heart",
+        0.6
+      ],
+      [
+        "af_sarah",
+        0.4
+      ]
+    ],
+    "speed": 1.12
+  },
+  "lines": {
+    "Hi there, I'm Mira! So glad you stopped by. What brings you here today?": {
+      "src": "/audio/mira/ab3f8b0ee304.wav",
+      "seconds": 4.47
+    },
+    "Hey, you're back! It's me, Mira. I was hoping you'd come say hi again. What can I help with today?": {
+      "src": "/audio/mira/e3bc84026997.wav",
+      "seconds": 5.88
+    },
+    "We build websites, web systems and mobile apps, and make sure they look and feel lovely too. Want to start dreaming up yours?": {
+      "src": "/audio/mira/587667e5263f.wav",
+      "seconds": 7.5
+    },
+    "Of course! Wander around as long as you like. If an idea sparks, just give me a shout. I'll be right here!": {
+      "src": "/audio/mira/b590bcd4e16d.wav",
+      "seconds": 6.33
+    },
+    "Yay, this is my favourite part! Let's get started.": {
+      "src": "/audio/mira/e4676395f9ad.wav",
+      "seconds": 3.45
+    },
+    "First things first, what can I help you build?": {
+      "src": "/audio/mira/9f4d18d3c109.wav",
+      "seconds": 3
+    },
+    "So, where's the project at right now?": {
+      "src": "/audio/mira/abc6f3d8b55b.wav",
+      "seconds": 2.58
+    },
+    "And when are you hoping to have it ready?": {
+      "src": "/audio/mira/20ef52cc8e48.wav",
+      "seconds": 2.5
+    },
+    "Now the money question, I promise I'll be gentle! Roughly what budget do you have in mind? A ballpark is totally fine.": {
+      "src": "/audio/mira/d2a79d5c5483.wav",
+      "seconds": 7.35
+    },
+    "Tell me a little about your idea! A sentence or two is plenty, and you can skip this if you like.": {
+      "src": "/audio/mira/c8ff37d53da9.wav",
+      "seconds": 5.68
+    },
+    "Tell me a little about your idea! I saw you peeking at the past projects. If one is close to what you want, tell me which one.": {
+      "src": "/audio/mira/36ae1c97562a.wav",
+      "seconds": 7.15
+    },
+    "Almost there! What's your name, and where's the best place to reach you?": {
+      "src": "/audio/mira/3eaa273b3581.wav",
+      "seconds": 4.13
+    },
+    "Ta-da! Here's everything I've got. Does it all look right?": {
+      "src": "/audio/mira/f783e2f7d33d.wav",
+      "seconds": 3.55
+    },
+    "Of course! Which bit should we tweak?": {
+      "src": "/audio/mira/9eeae0bbc1df.wav",
+      "seconds": 2.45
+    },
+    "Okay, fresh start! What brings you here today?": {
+      "src": "/audio/mira/34743f70dab9.wav",
+      "seconds": 3.35
+    },
+    "What kind of website are you picturing?": {
+      "src": "/audio/mira/b95140656a58.wav",
+      "seconds": 2.65
+    },
+    "What kind of system are you dreaming up?": {
+      "src": "/audio/mira/f3fe2cfdef2a.wav",
+      "seconds": 2.65
+    },
+    "What kind of app are we making?": {
+      "src": "/audio/mira/527f68754288.wav",
+      "seconds": 2.15
+    },
+    "What would you like us to design?": {
+      "src": "/audio/mira/dff1316ccd13.wav",
+      "seconds": 2.13
+    },
+    "Ooh, a website! Love it.": {
+      "src": "/audio/mira/d8fe0c53875a.wav",
+      "seconds": 2.13
+    },
+    "A web system? Ooh, those are some of my favourites to build!": {
+      "src": "/audio/mira/c0f0cb3b4b1b.wav",
+      "seconds": 4.03
+    },
+    "A mobile app! Your idea in everyone's pocket, how exciting.": {
+      "src": "/audio/mira/4de5f42686b1.wav",
+      "seconds": 4.05
+    },
+    "Design work, yay! Making things look good is my happy place.": {
+      "src": "/audio/mira/fef5ad8661b5.wav",
+      "seconds": 4.2
+    },
+    "Ooh, a mystery project! Now I'm really curious.": {
+      "src": "/audio/mira/c9b17f8c78f4.wav",
+      "seconds": 3.38
+    },
+    "Great choice!": {
+      "src": "/audio/mira/7ee756b790a2.wav",
+      "seconds": 1.63
+    },
+    "Oh, I like that one!": {
+      "src": "/audio/mira/6c9bef420c56.wav",
+      "seconds": 2
+    },
+    "Ooh, good pick!": {
+      "src": "/audio/mira/6ed1c29fce16.wav",
+      "seconds": 1.6
+    },
+    "Nice, I can already picture it!": {
+      "src": "/audio/mira/fabceae2b007.wav",
+      "seconds": 2.4
+    },
+    "Love that!": {
+      "src": "/audio/mira/4073dc40fda4.wav",
+      "seconds": 1.5
+    },
+    "Every great project starts as an idea, so you're right on track!": {
+      "src": "/audio/mira/36f59cf0e0a6.wav",
+      "seconds": 4.15
+    },
+    "A design already? Look at you, ahead of the game!": {
+      "src": "/audio/mira/ee35083bdb98.wav",
+      "seconds": 3.35
+    },
+    "Ooh, something to build on. I love a good glow-up!": {
+      "src": "/audio/mira/1cea6517cf4b.wav",
+      "seconds": 3.33
+    },
+    "Got it! Let's give it some tender loving care.": {
+      "src": "/audio/mira/af14782dad96.wav",
+      "seconds": 3.08
+    },
+    "Noted! That really helps us plan.": {
+      "src": "/audio/mira/130453a0e8a1.wav",
+      "seconds": 2.68
+    },
+    "Perfect, that gives us a great starting point.": {
+      "src": "/audio/mira/4412b50b5665.wav",
+      "seconds": 3.05
+    },
+    "Totally fine! Lots of people figure that out along the way.": {
+      "src": "/audio/mira/d12fa0267c94.wav",
+      "seconds": 4.05
+    },
+    "Ooh, I love that! Thanks for sharing.": {
+      "src": "/audio/mira/d343f3277447.wav",
+      "seconds": 2.65
+    },
+    "No worries at all, we can chat about it later.": {
+      "src": "/audio/mira/78de210bf2e4.wav",
+      "seconds": 3.2
+    },
+    "Thank you, lovely to meet you!": {
+      "src": "/audio/mira/03cacd1fa7db.wav",
+      "seconds": 2.33
+    },
+    "Ooh, a plot twist! Let's rewind.": {
+      "src": "/audio/mira/05cb73697e8f.wav",
+      "seconds": 2.65
+    },
+    "Going backwards? Watch me moonwalk.": {
+      "src": "/audio/mira/152bf0c3083a.wav",
+      "seconds": 2.75
+    },
+    "Don't worry, I pretended not to see that.": {
+      "src": "/audio/mira/5500699afc1a.wav",
+      "seconds": 2.88
+    },
+    "Second thoughts are my favourite kind of thoughts.": {
+      "src": "/audio/mira/2c79196224bc.wav",
+      "seconds": 3.05
+    },
+    "Rewinding! Beep, beep, beep.": {
+      "src": "/audio/mira/b9d453c355de.wav",
+      "seconds": 2.48
+    },
+    "Back we go. I won't tell anyone.": {
+      "src": "/audio/mira/88c11ef1e254.wav",
+      "seconds": 2.6
+    },
+    "Undo, undo! No harm done.": {
+      "src": "/audio/mira/0d0f25fbebc3.wav",
+      "seconds": 2.4
+    },
+    "Changed your mind? That's what I'm here for.": {
+      "src": "/audio/mira/43399b9cb523.wav",
+      "seconds": 2.9
+    },
+    "All the way back to the start? Okay, take two!": {
+      "src": "/audio/mira/11a115a1ef8a.wav",
+      "seconds": 3.33
+    },
+    "A whole new plan? Ooh, I do love a bit of drama.": {
+      "src": "/audio/mira/3127752ca67d.wav",
+      "seconds": 3.53
+    },
+    "Picking again? Choosing is the fun part anyway.": {
+      "src": "/audio/mira/b0b270815e39.wav",
+      "seconds": 3.33
+    },
+    "Wait, did the project just time travel?": {
+      "src": "/audio/mira/de67d4443a7e.wav",
+      "seconds": 2.98
+    },
+    "Checking the calendar again? Smart move.": {
+      "src": "/audio/mira/a55bca84d628.wav",
+      "seconds": 2.93
+    },
+    "Counting the piggy bank again? Take your time, I'll wait.": {
+      "src": "/audio/mira/d28d2f7d0df5.wav",
+      "seconds": 3.65
+    },
+    "More to say? I'm all ears. Well, all orb.": {
+      "src": "/audio/mira/8eddfe7d24b8.wav",
+      "seconds": 3.05
+    },
+    "A typo in your own name? Happens to the best of us.": {
+      "src": "/audio/mira/ca694060d9f3.wav",
+      "seconds": 3.48
+    },
+    "Oops, I didn't quite catch that! Could you pick one of these for me?": {
+      "src": "/audio/mira/528cbce41b1e.wav",
+      "seconds": 3.93
+    },
+    "Still there? Take your time, I'm right here.": {
+      "src": "/audio/mira/afb9327bc84f.wav",
+      "seconds": 2.68
+    },
+    "No rush at all! I'll just be here, glowing quietly.": {
+      "src": "/audio/mira/8e811382fcb8.wav",
+      "seconds": 3.7
+    },
+    "Thinking it over? The best ideas take a moment.": {
+      "src": "/audio/mira/5230d9abde93.wav",
+      "seconds": 3.33
+    },
+    "Off so soon? Leave your contact before you go, and we'll pick it up from there!": {
+      "src": "/audio/mira/497f351b469d.wav",
+      "seconds": 4.7
+    },
+    "Hehe, that tickles!": {
+      "src": "/audio/mira/c540eb617cc1.wav",
+      "seconds": 1.85
+    },
+    "Oh, hi! You found me.": {
+      "src": "/audio/mira/2a1c9919922b.wav",
+      "seconds": 1.98
+    },
+    "Boop! Ready when you are.": {
+      "src": "/audio/mira/1a15d252d0a4.wav",
+      "seconds": 1.95
+    },
+    "Careful, I'm ticklish!": {
+      "src": "/audio/mira/13d8dd3c4210.wav",
+      "seconds": 2.03
+    },
+    "Hehe, again? Okay, one more.": {
+      "src": "/audio/mira/0cb777ad8709.wav",
+      "seconds": 2.45
+    },
+    "Sending it over now…": {
+      "src": "/audio/mira/7d3878d665a2.wav",
+      "seconds": 1.98
+    },
+    "Thank you so much! Your project details are on their way, and you'll hear back within one to two working days. I can't wait to see what we build together!": {
+      "src": "/audio/mira/2f08fe1e6b90.wav",
+      "seconds": 8.7
+    },
+    "All set! Your email app should pop open with everything filled in, so just hit send.": {
+      "src": "/audio/mira/486fb56099f9.wav",
+      "seconds": 5.35
+    },
+    "Oh no, that one didn't go through! Want to try again, or send an email instead?": {
+      "src": "/audio/mira/9731252d5cb9.wav",
+      "seconds": 5.2
+    }
+  }
+}
