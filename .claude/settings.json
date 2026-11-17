@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/auto-commit.mjs\" --claude",
+            "timeout": 60,
+            "statusMessage": "Committing changes"
+          }
+        ]
+      }
+    ]
+  }
+}
