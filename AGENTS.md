@@ -28,3 +28,7 @@ In browser tests, wait on these attributes (for Mira: `data-phase="asking"` and 
 - `npm test`: Mira's machines, question order and written replies, and that every line she says has a recording. No browser needed; run it after any change to `src/lib/mira*`, `src/lib/machine.ts` or `src/data/assistant.ts`.
 - `npm run voice`: records new or changed lines from `src/data/assistant.ts` in Mira's voice (also runs before `npm run dev`). A line without a recording is spoken in a fallback voice, and `npm test` fails.
 - `npx tsc --noEmit -p .` and `npx eslint src scripts` must both be clean.
+
+## Commits
+
+Changes are committed automatically (`scripts/auto-commit.mjs`): by a Claude Code Stop hook after each turn (`.claude/settings.json`, generic "Auto-save" message), and by the admin after each save, delete or reorder (project list and uploads only). To give a change a meaningful message, commit it yourself before the turn ends; the hook then finds nothing left to commit.
