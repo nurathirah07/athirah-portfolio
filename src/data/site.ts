@@ -17,6 +17,10 @@ export const site = {
   // formspree.io and paste its ID here (the part after /f/ in its address).
   // Left empty, sending an enquiry opens the visitor's email app instead.
   formspree: "mkjrrgkj",
+  // The site's public address, used for link previews and the sitemap. Leave
+  // empty on Vercel: its own address is used. Set it if you add a custom
+  // domain, e.g. "https://athirahazmi.com".
+  url: "",
   heroLine: "Software Developer building web, mobile and AI systems",
   statement: "I build web and mobile software for day-to-day business work, such as stock control, sales and repair tracking.",
   expertiseIntro: "The kinds of work I take on.",
@@ -133,6 +137,14 @@ export function normalizeProject(p: Stored): Project {
         : "web";
   return { ...p, shots, platform };
 }
+
+/** The site's public address: the one set above, else Vercel's, else this computer's. */
+export const siteUrl = (
+  site.url ||
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "") ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+  "http://localhost:3000"
+).replace(/\/$/, "");
 
 // Projects are edited through /admin (run `npm run dev`), which saves to projects.json.
 export const projects: Project[] = projectData.map(normalizeProject);

@@ -7,9 +7,11 @@ import Footer from "@/components/Footer";
 import Glow from "@/components/Glow";
 import SmoothScroll from "@/components/SmoothScroll";
 import VisitNote from "@/components/VisitNote";
-import { site } from "@/data/site";
+import { site, siteUrl } from "@/data/site";
 
 export const metadata: Metadata = {
+  // Link previews need full addresses; this makes relative ones (like the preview image) work.
+  metadataBase: new URL(siteUrl),
   title: `${site.name} — ${site.role}`,
   description: site.tagline,
   // Shown when the link is shared in chat apps and on social media.
