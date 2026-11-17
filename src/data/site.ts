@@ -16,7 +16,7 @@ export const site = {
   // Free form service that delivers Mira's enquiries to your inbox. Make a form at
   // formspree.io and paste its ID here (the part after /f/ in its address).
   // Left empty, sending an enquiry opens the visitor's email app instead.
-  formspree: "",
+  formspree: "mkjrrgkj",
   heroLine: "Software Developer building web, mobile and AI systems",
   statement: "I build web and mobile software for day-to-day business work, such as stock control, sales and repair tracking.",
   expertiseIntro: "The kinds of work I take on.",
