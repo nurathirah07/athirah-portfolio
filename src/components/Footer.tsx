@@ -94,6 +94,11 @@ export default function Footer() {
                   <li>
                     <a href={`mailto:${site.email}`} className="inline-block py-1.5 text-cream/80 hover:text-gold"><RollText>Email ↗</RollText></a>
                   </li>
+                  {site.links.resume && (
+                    <li>
+                      <a href={site.links.resume} download="Nur Athirah Azmi - Resume.pdf" className="inline-block py-1.5 text-cream/80 hover:text-gold"><RollText>Resume ↓</RollText></a>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>

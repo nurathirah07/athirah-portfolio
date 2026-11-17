@@ -11,7 +11,8 @@ export const site = {
   links: {
     github: "https://github.com/nurathirah07", // e.g. "https://github.com/your-username"
     linkedin: "http://linkedin.com/in/athirah-azmi-432b65376", // e.g. "http://linkedin.com/in/athirah-azmi-432b65376"
-    resume: "", // put resume.pdf in /public, then set this to "/resume.pdf"
+    // The public copy of your resume (phone number and referee details removed).
+    resume: "/resume.pdf",
   },
   // Free form service that delivers Mira's enquiries to your inbox. Make a form at
   // formspree.io and paste its ID here (the part after /f/ in its address).

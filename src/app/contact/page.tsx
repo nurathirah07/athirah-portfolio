@@ -13,6 +13,7 @@ export default function Contact() {
     { label: "Time zone", value: "GMT+8 (Malaysia)" },
     { label: "GitHub", value: "View profile ↗", href: site.links.github },
     { label: "LinkedIn", value: "View profile ↗", href: site.links.linkedin },
+    { label: "Resume", value: "Download PDF ↓", href: site.links.resume },
   ].filter((d) => d.href !== "");
 
   return (
@@ -38,7 +39,7 @@ export default function Contact() {
                 <dt className="font-accent text-[11px] text-cream/50">{d.label}</dt>
                 <dd className="text-right text-sm font-medium md:text-base">
                   {d.href ? (
-                    <a href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} rel="noreferrer" className="hover:text-gold">
+                    <a href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} download={d.href.endsWith(".pdf") ? "Nur Athirah Azmi - Resume.pdf" : undefined} rel="noreferrer" className="hover:text-gold">
                       <RollText>{d.value}</RollText>
                     </a>
                   ) : (
