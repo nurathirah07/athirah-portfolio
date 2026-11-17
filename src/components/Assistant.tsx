@@ -16,7 +16,7 @@ const MET = "mira:met"; // remembered on this device: has talked to Mira before
 const SEEN_WORK = "mira:seenWork"; // remembered for this visit: has looked at the projects (set by VisitNote)
 
 type Status = "talking" | "sending" | "sent" | "drafted" | "failed";
-type AiReply = { ai: boolean; reply: string; mood: Mood; step: Step; options: string[]; input: Input; brief: Brief };
+type AiReply = { ai: boolean; reply: string; spoken?: string[]; mood: Mood; step: Step; options: string[]; input: Input; brief: Brief };
 
 // Mira: a friendly assistant who collects a short project brief, one question
 // at a time. She says each line aloud while it types out, and the orb moves
@@ -100,8 +100,6 @@ export default function Assistant() {
       .then((res) => res.json())
       .then((data: { ai?: boolean }) => {
         setAiOn(!!data.ai);
-        // Live replies have no recordings, so get her in-browser voice ready early.
-        if (data.ai) enableLiveVoice();
       })
       .catch(() => {});
   }, []);
@@ -142,7 +140,7 @@ export default function Assistant() {
   // Say each new line aloud as soon as it appears. Coming back to this page
   // (Next keeps it alive, hidden) says the current line again.
   useEffect(() => {
-    if (seen && prompt && !thinking) void speak(spoken, { aiWritten: !!turn && turn.recorded === null && status === "talking" });
+    if (seen && prompt && !thinking) void speak(spoken, { aiWritten: !!turn?.aiWritten && status === "talking" });
     // `spoken` is rebuilt every render; lineId identifies the line.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lineId, seen, thinking]);
@@ -232,8 +230,18 @@ export default function Assistant() {
       const data = (await res.json()) as AiReply;
       if (!data.ai) throw new Error("AI unavailable");
       memo.current.aiFails = 0;
-      enableLiveVoice();
-      return { reply: data.reply, recorded: null, mood: data.mood, step: data.step, options: data.options, input: data.input, brief: { ...data.brief, name, contact } };
+      return {
+        reply: data.reply,
+        // Spoken in parts: her recorded question plays at once in her own voice;
+        // the AI's reaction before it is voiced only if her in-browser voice is quick enough.
+        recorded: data.spoken?.length ? data.spoken : null,
+        aiWritten: true,
+        mood: data.mood,
+        step: data.step,
+        options: data.options,
+        input: data.input,
+        brief: { ...data.brief, name, contact },
+      };
     } catch {
       // Two failures in a row: stop asking and stay with the written lines.
       if (++memo.current.aiFails >= 2) setAiOn(false);
@@ -260,7 +268,11 @@ export default function Assistant() {
     }
 
     let next: Turn | null = null;
-    if (aiOn && did.kind !== "back" && did.kind !== "start" && at !== "summary" && mira.send({ type: "THINK", after: turnId })) {
+    // The AI handles typed messages, where understanding free text matters. Taps
+    // and forms get her written replies, which have recordings, so her own voice
+    // plays instantly. (AI-written lines can't be recorded ahead of time.)
+    if (aiOn && did.kind === "text" && at !== "summary" && mira.send({ type: "THINK", after: turnId })) {
+      enableLiveVoice(); // her voice for the AI's words: downloaded only once someone types
       feel("thinking");
       next = await askAI(at, answers, did);
     }

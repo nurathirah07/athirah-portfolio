@@ -254,15 +254,22 @@ export async function POST(request: Request) {
     }
   }
 
-  // Her question must be the one the page is about to show. If she asked
-  // about something else, keep her reaction and ask the right question.
-  if (step !== "greeting" && wanted !== step) {
-    reply = [reactionOf(reply), questionFor(step, brief)].filter(Boolean).join(" ");
+  // Her reply is the AI's reaction followed by the written question for the
+  // next step. That question is always the one the page shows, and it has a
+  // recording, so it is spoken in her own voice at once (see `spoken` below).
+  // On the greeting (services tour, just browsing) the AI's words stand alone.
+  let spoken = [reply];
+  if (step !== "greeting") {
+    const reaction = reactionOf(reply);
+    const question = questionFor(step, brief);
+    spoken = [reaction, question].filter(Boolean);
+    reply = spoken.join(" ");
   }
 
   return Response.json({
     ai: true,
     reply,
+    spoken, // the reply in parts: the AI's reaction (no recording), then the recorded question
     mood,
     step,
     options: options ?? optionsFor(step, brief),

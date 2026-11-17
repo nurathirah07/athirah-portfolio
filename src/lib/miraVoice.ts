@@ -14,6 +14,11 @@ import { createMachine } from "./machine";
 
 const lines = recorded.lines as Record<string, { src: string; seconds: number }>;
 const GAP = 0.18; // seconds of quiet between two lines
+const LIVE_WAIT_MS = 2500; // longest wait for the in-browser voice before going on without it
+
+// Resolves with null if the promise takes longer than `ms`.
+const withinTime = <T,>(promise: Promise<T | null>, ms: number) =>
+  Promise.race([promise, new Promise<null>((done) => setTimeout(() => done(null), ms))]);
 
 let ctx: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
@@ -194,19 +199,27 @@ function sayWithBrowser(text: string) {
  */
 export async function speak(texts: string[], { aiWritten = false }: { aiWritten?: boolean } = {}) {
   stopSpeaking();
+  // For tests and debugging: what she was last asked to say.
+  if (process.env.NODE_ENV !== "production") (window as Window & { __miraSaid?: string[][] }).__miraSaid?.push(texts);
   const mine = turn;
   const unrecorded = texts.filter((t) => !lines[t]);
-  // Lines written live by the AI never have recordings; only written lines should.
-  if (!aiWritten) for (const t of unrecorded) missing(t);
-  if (unrecorded.length && live.get().name !== "ready") {
-    enableLiveVoice(); // so later lines can use her real voice
-    sayWithBrowser(texts.join(" "));
-    return;
+  // A written line without a recording is a mistake (`npm run voice` wasn't
+  // run): say so, and read it in the browser's own voice rather than not at all.
+  if (!aiWritten && unrecorded.length) {
+    for (const t of unrecorded) missing(t);
+    if (live.get().name !== "ready") {
+      sayWithBrowser(texts.join(" "));
+      return;
+    }
   }
+  // Lines the AI wrote live never have recordings. They're voiced in her own
+  // voice only when the in-browser voice is ready and quick; otherwise they're
+  // shown but not spoken, so she never switches to a different voice and her
+  // recorded question isn't kept waiting.
   const parts: Promise<AudioBuffer | null>[] = [];
   for (const t of texts) {
     if (lines[t]) parts.push(load(lines[t].src).catch(() => null));
-    else for (const sentence of sentences(t)) parts.push(synth(sentence));
+    else if (live.get().name === "ready") for (const sentence of sentences(t)) parts.push(withinTime(synth(sentence), LIVE_WAIT_MS));
   }
   if (parts.length === 0) return;
   const audio = context();
