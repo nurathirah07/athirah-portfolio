@@ -27,7 +27,7 @@ const PER_IMAGE = 0.45; // each photo, including its pause
 const END_HOLD = 0.1; // last photo stays before the page moves on
 const TOTAL = INTRO + EXPAND + (N - 1) * PER_IMAGE + END_HOLD;
 const DWELL = 0.4; // share of each photo's budget spent standing still
-const RADIUS = 22; // corner rounding of a settled photo, in px
+const RADIUS = 0; // a settled photo fills the screen edge to edge
 
 // Round previous/next buttons: gold on hover, flame while pressed.
 const STEP =
@@ -37,11 +37,10 @@ const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
 
-// Where photos live once settled: the left part of the screen on wide
-// layouts (details sit on the right), the top part on phones.
+// Where photos live once settled: the whole screen, as the background the
+// story sits on.
 function area(vw: number, vh: number) {
-  if (vw >= 1024) return { l: 48, r: vw * 0.56, t: 112, b: vh - 48 };
-  return { l: 20, r: vw - 20, t: 140, b: 140 + vh * 0.34 };
+  return { l: 0, r: vw, t: 0, b: vh };
 }
 
 function layout(p: number, vw: number, vh: number) {
@@ -61,11 +60,10 @@ function layout(p: number, vw: number, vh: number) {
 
 type Geo = ReturnType<typeof layout>;
 
-// Size of a photo fitted whole inside the settled area.
-function fitted(width: number, height: number, vw: number, vh: number) {
+// Size of a settled photo: it covers the whole area (cropped to fit, never stretched).
+function fitted(vw: number, vh: number) {
   const a = area(vw, vh);
-  const k = Math.min((a.r - a.l) / width, (a.b - a.t) / height);
-  return { w: width * k, h: height * k };
+  return { w: a.r - a.l, h: a.b - a.t };
 }
 
 // Scroll position (0-1 through the pinned section) where a photo sits still.
@@ -88,16 +86,16 @@ function Frame({
 }) {
   // The element is always its final, settled size, so the photo is drawn at
   // full sharpness. The row of panels is made by scaling and clipping it.
-  const width = useTransform([vw, vh], ([vw, vh]: number[]) => fitted(frame.width, frame.height, vw, vh).w);
-  const height = useTransform([vw, vh], ([vw, vh]: number[]) => fitted(frame.width, frame.height, vw, vh).h);
+  const width = useTransform([vw, vh], ([vw, vh]: number[]) => fitted(vw, vh).w);
+  const height = useTransform([vw, vh], ([vw, vh]: number[]) => fitted(vw, vh).h);
 
   const shape = useTransform(geo, (g) => {
-    const f = fitted(frame.width, frame.height, g.vw, g.vh);
+    const f = fitted(g.vw, g.vh);
     const startScale = Math.max(g.cardW / f.w, g.cardH / f.h);
     const scale = lerp(startScale, 1, g.e);
     const w = lerp(g.cardW, f.w, g.e);
     const h = lerp(g.cardH, f.h, g.e);
-    const step = g.a.r - g.a.l + 32;
+    const step = g.a.r - g.a.l;
     const cx = lerp(g.x0 + index * (g.cardW + g.gap) + g.cardW / 2, (g.a.l + g.a.r) / 2 + (index - g.pos) * step, g.e);
     const cy = lerp(g.vh * 0.56, (g.a.t + g.a.b) / 2, g.e);
     const insetX = Math.max(0, (f.w - w / scale) / 2);
@@ -119,7 +117,7 @@ function Frame({
         className="absolute inset-0"
       >
         <motion.div style={{ clipPath }} className="absolute inset-0 bg-ink">
-          <Image src={frame.src} alt={frame.alt} fill priority sizes="(min-width: 768px) 60vw, 90vw" className="object-cover" style={{ objectPosition: frame.position }} />
+          <Image src={frame.src} alt={frame.alt} fill priority sizes="100vw" className="object-cover" style={{ objectPosition: frame.position }} />
           <div aria-hidden className="absolute inset-0 rounded-[inherit] shadow-[inset_0_0_0_1px_rgb(243_239_221/0.08)]" />
         </motion.div>
       </motion.div>
@@ -127,9 +125,9 @@ function Frame({
   );
 }
 
-// About page: photos start as a row of panels, the first settles into a
-// rounded frame, then each photo slides in with its stage's story beside it
-// in a glass panel. Tabs jump between chapters; segments jump between photos.
+// About page: photos start as a row of panels, the first grows to fill the
+// whole screen, then each photo slides in as the background of its stage's story
+// (written over it on the left). Tabs jump between chapters; segments jump between photos.
 export default function Journey() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -218,13 +216,13 @@ export default function Journey() {
           </div>
         </motion.div>
 
-        {/* Glass panel behind the story on wide screens, with the chapter number set large and faint */}
-        <motion.div
-          aria-hidden
-          style={{ opacity: detailOpacity }}
-          className="glass absolute hidden overflow-hidden rounded-[2rem] lg:bottom-8 lg:left-[58vw] lg:right-8 lg:top-24 lg:block"
-        >
-          <div className="absolute -right-16 -top-16 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgb(224_202_60/0.14),transparent)] blur-2xl" />
+        {/* Once the photo fills the screen: darker where the words sit (the left on wide
+            screens, the bottom on phones) and at the top behind the navigation */}
+        <motion.div aria-hidden style={{ opacity: e }} className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-ink/25" />
+          <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/70 to-transparent lg:bg-linear-to-r lg:from-ink/90 lg:via-ink/55 lg:to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-48 bg-linear-to-b from-ink/80 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-linear-to-t from-ink/80 to-transparent" />
         </motion.div>
 
         {/* Stage tabs: top of the screen on phones, top of the story panel on wide screens */}
@@ -232,7 +230,7 @@ export default function Journey() {
           style={{ opacity: detailOpacity, pointerEvents: detailPointer }}
           role="group"
           aria-label="Journey stages"
-          className="absolute inset-x-5 top-20 grid grid-cols-3 rounded-full border border-cream/12 bg-ink/50 p-1 backdrop-blur lg:left-[calc(58vw+2rem)] lg:right-16 lg:top-32"
+          className="glass absolute inset-x-5 top-20 grid grid-cols-3 rounded-full p-1 lg:left-12 lg:right-auto lg:top-28 lg:w-[30rem]"
         >
           {stages.map((s, i) => {
             const on = i === current.stageIndex;
@@ -242,7 +240,7 @@ export default function Journey() {
                 type="button"
                 onClick={() => goTo(stageStart(i))}
                 aria-current={on ? "step" : undefined}
-                className={`relative rounded-full px-2 py-2.5 text-center font-accent text-[13px] transition-colors duration-300  ${on ? "text-ink" : "text-cream/70 md:text-cream/55 hover:text-cream"}`}
+                className={`relative rounded-full px-2 py-2.5 text-center font-accent text-sm transition-colors duration-300 ${on ? "text-ink" : "text-cream/80 hover:text-cream"}`}
               >
                 {/* The gold pill slides between tabs as the chapter changes */}
                 {on && (
@@ -264,7 +262,7 @@ export default function Journey() {
         {/* Story for the photo on screen */}
         <motion.div
           style={{ opacity: detailOpacity, pointerEvents: detailPointer }}
-          className="absolute inset-x-5 bottom-5 top-[calc(140px+34svh+20px)] flex flex-col justify-between lg:bottom-16 lg:left-[calc(58vw+2rem)] lg:right-16 lg:top-52"
+          className="absolute inset-x-5 bottom-6 top-36 flex flex-col justify-end lg:inset-x-12 lg:bottom-10 lg:top-44 lg:justify-between"
         >
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
@@ -273,16 +271,16 @@ export default function Journey() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: reduce ? 0 : -10 }}
               transition={{ duration: 0.35, ease: EASE }}
-              className="flex min-h-0 flex-col lg:my-auto"
+              className="flex min-h-0 max-w-2xl flex-col lg:my-auto"
             >
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-accent text-[13px]">
-                <span className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-gold">{stage.period}</span>
-                <span className="text-cream/70 md:text-cream/50">Chapter {current.stageIndex + 1} of {stages.length}</span>
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-semibold">
+                <span className="glass rounded-full px-3.5 py-1.5 text-cream">{stage.period}</span>
+                <span className="text-cream/80">Chapter {current.stageIndex + 1} of {stages.length}</span>
               </p>
-              <h2 className="mt-4 font-display text-2xl leading-tight md:mt-5 md:text-4xl">{stage.org}</h2>
-              <p className="mt-1.5 text-[15px] text-cream/75 md:text-base md:text-cream/60">{stage.role}</p>
-              <p className="mt-4 border-l-2 border-gold pl-4 text-lg font-medium leading-snug md:mt-7 md:text-2xl">{stage.headline}</p>
-              <p className="mt-3 text-[15px] leading-relaxed text-cream/80 md:mt-4 md:text-base">{stage.body}</p>
+              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[0.95] tracking-[-0.04em] md:text-6xl xl:text-7xl">{stage.org}</h2>
+              <p className="mt-3 text-base font-semibold text-cream/85 md:text-lg">{stage.role}</p>
+              <p className="mt-5 text-xl font-semibold leading-snug md:mt-7 md:text-3xl">{stage.headline}</p>
+              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-cream/85 md:mt-4 md:text-base">{stage.body}</p>
               {/* Tags need a tall screen; on short ones they would run into the photo controls. */}
               <ul className="mt-6 hidden flex-wrap gap-2 [@media(min-height:840px)]:md:flex">
                 {stage.tags.map((t) => (
