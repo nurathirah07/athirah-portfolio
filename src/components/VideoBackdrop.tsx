@@ -27,15 +27,18 @@ const phases: Transitions<Phase, VideoEvent> = {
   failed: {},
 };
 
-// At most two videos play at once across the page; starting a third pauses
-// the one that has been playing longest.
-const MAX_PLAYING = 2;
+// At most two videos play at once across the page (one on phones); starting
+// another pauses the one that has been playing longest. On phones the Work
+// cards stack over each other, and a covered card still counts as on screen,
+// so with two allowed one would always be decoding out of sight.
+const maxPlaying = () => (window.matchMedia("(max-width: 767px)").matches ? 1 : 2);
 const playing: HTMLVideoElement[] = [];
 function startedPlaying(video: HTMLVideoElement) {
   const i = playing.indexOf(video);
   if (i >= 0) playing.splice(i, 1);
   playing.push(video);
-  while (playing.length > MAX_PLAYING) playing.shift()?.pause();
+  const max = maxPlaying();
+  while (playing.length > max) playing.shift()?.pause();
 }
 function stoppedPlaying(video: HTMLVideoElement) {
   const i = playing.indexOf(video);

@@ -8,7 +8,8 @@ type Source = { kind: "text"; text: string } | { kind: "image"; src: string };
 /**
  * Draws its parent's content as thousands of fine dots: a line of text (in
  * extra-bold, filling the parent) or a photo (denser dots where it's lighter,
- * like a halftone). The dots shy away from the pointer and drift back.
+ * like a halftone). The dots shy away from a mouse pointer and drift back.
+ * (On touch screens a drag scrolls the page, so the dots stay still there.)
  * It fills its parent, which must be positioned and sized. The parent can move
  * (a marquee, a parallax layer): the pointer is read in page coordinates.
  * Only redraws while dots are moving, so a still page costs nothing.
@@ -61,7 +62,8 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
       w = r.width;
       h = r.height;
       if (!w || !h) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Phones draw at a slightly lower resolution: the dots are tiny either way.
+      const dpr = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
       c.width = Math.round(w * dpr);
       c.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -152,6 +154,7 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
     };
 
     const move = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
       pointer.x = e.clientX;
       pointer.y = e.clientY;
       schedule();
@@ -169,12 +172,19 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
     resize.observe(host);
     window.addEventListener("pointermove", move, { passive: true });
     document.documentElement.addEventListener("pointerleave", gone);
+    // A finger that lifts (or starts scrolling the page) is gone too. Without this
+    // the dots kept "seeing" the last touch and redrew every frame, slowing phones.
+    const lifted = (e: PointerEvent) => e.pointerType !== "mouse" && gone();
+    window.addEventListener("pointerup", lifted, { passive: true });
+    window.addEventListener("pointercancel", lifted, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
       seen.disconnect();
       resize.disconnect();
       window.removeEventListener("pointermove", move);
       document.documentElement.removeEventListener("pointerleave", gone);
+      window.removeEventListener("pointerup", lifted);
+      window.removeEventListener("pointercancel", lifted);
     };
     // `source` is described by `key`; the other props are fixed for a given use.
     // eslint-disable-next-line react-hooks/exhaustive-deps

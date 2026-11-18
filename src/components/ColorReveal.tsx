@@ -71,7 +71,8 @@ export default function ColorReveal({
 
     const resize = () => {
       const rect = wrap.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Phones draw at a slightly lower resolution: the colour is a soft brush anyway.
+      const dpr = Math.min(window.devicePixelRatio || 1, window.matchMedia("(max-width: 767px)").matches ? 1.5 : 2);
       w = rect.width;
       h = rect.height;
       radius = Math.max(45, Math.min(150, w * 0.24));
@@ -141,13 +142,22 @@ export default function ColorReveal({
       wake();
     };
 
+    // The browser cancels the touch when the finger starts scrolling the page:
+    // that was a scroll, not painting, so drop the trail at once instead of
+    // letting it fade (which repaints the whole photo every frame).
+    const scrolled = () => {
+      stamps = [];
+      pointer = null;
+      wake();
+    };
+
     resize();
     const observer = new ResizeObserver(resize);
     observer.observe(wrap);
     wrap.addEventListener("pointerdown", move);
     wrap.addEventListener("pointermove", move);
     wrap.addEventListener("pointerleave", leave);
-    wrap.addEventListener("pointercancel", leave);
+    wrap.addEventListener("pointercancel", scrolled);
 
     return () => {
       gone = true;
@@ -158,7 +168,7 @@ export default function ColorReveal({
       wrap.removeEventListener("pointerdown", move);
       wrap.removeEventListener("pointermove", move);
       wrap.removeEventListener("pointerleave", leave);
-      wrap.removeEventListener("pointercancel", leave);
+      wrap.removeEventListener("pointercancel", scrolled);
     };
   }, [src]);
 

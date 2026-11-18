@@ -187,14 +187,18 @@ export default function SceneBackground() {
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", down, { passive: true });
 
-    // Copy the video to the GPU only when it has a new frame (30 a second),
+    // Copy the video to the GPU only when it has a new frame (30 a second, 15 on phones),
     // not on every screen refresh. Browsers without requestVideoFrameCallback
     // copy every time, as before.
     let fresh = true;
     let watching = 0;
     const watchFrames = "requestVideoFrameCallback" in video;
+    // Phones take every other video frame (15 a second): the background moves
+    // slowly, so it looks the same, and it halves the copying.
+    let frameCount = 0;
     const onVideoFrame = () => {
-      fresh = true;
+      frameCount++;
+      if (!phone || frameCount % 2 === 0) fresh = true;
       watching = video.requestVideoFrameCallback(onVideoFrame);
     };
     if (watchFrames) watching = video.requestVideoFrameCallback(onVideoFrame);
