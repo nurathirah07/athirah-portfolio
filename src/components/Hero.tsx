@@ -1,8 +1,8 @@
 "use client";
-import Image from "next/image";
 import { useLayoutEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import ColorReveal from "@/components/ColorReveal";
+import Dotted from "@/components/Dotted";
 import SceneBackground from "@/components/SceneBackground";
 import { photos } from "@/data/photos";
 import { site } from "@/data/site";
@@ -11,9 +11,11 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const AFTER_LOADING = 2.3; // seconds: on a full page load, waits for the loading screen to lift
 const AFTER_TRANSITION = 0.5; // seconds: arriving from another page, waits for the page transition
 const NAME_COPIES = [0, 1, 2, 3];
+// The two echoes are drawn in dots (see Dotted), which read lighter than a
+// solid photo, so they sit a little brighter than the photo did.
 const ECHOES = [
-  { side: -1, drift: 0.95, opacity: 0.2 },
-  { side: 1, drift: 0.95, opacity: 0.2 },
+  { side: -1, drift: 0.95, opacity: 0.42 },
+  { side: 1, drift: 0.95, opacity: 0.42 },
 ];
 
 export default function Hero() {
@@ -32,7 +34,7 @@ export default function Hero() {
   const echoRightY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, -130]);
 
   return (
-    <section ref={ref} data-code="Hero" className="relative -mx-6 -mt-32 h-svh min-h-150 overflow-hidden md:-mx-12">
+    <section ref={ref} className="relative -mx-6 -mt-32 h-svh min-h-150 overflow-hidden md:-mx-12">
       <h1 className="sr-only">{site.name}, {site.role}</h1>
 
       {/* Moving gradient that follows the cursor and ripples; sits under everything */}
@@ -49,15 +51,10 @@ export default function Hero() {
             className="absolute bottom-0"
           >
             <motion.div style={{ y: side < 0 ? echoLeftY : echoRightY, scale: drift }} className="origin-bottom">
-              <Image
-                src={photos.echo.src}
-                width={photos.echo.width}
-                height={photos.echo.height}
-                alt=""
-                sizes="(min-width: 768px) 30vw, 70vw"
-                priority
-                className="h-[min(88svh,175vw)] w-auto max-w-none"
-              />
+              {/* The echo photo, drawn in dots that part around the pointer */}
+              <div className="relative h-[min(88svh,175vw)]" style={{ aspectRatio: `${photos.echo.width} / ${photos.echo.height}` }}>
+                <Dotted source={{ kind: "image", src: photos.echo.src }} gap={5} dot={1.8} />
+              </div>
             </motion.div>
           </motion.div>
         ))}
@@ -111,9 +108,16 @@ export default function Hero() {
         style={{ x: nameX }}
         className="pointer-events-none absolute bottom-[3svh] left-0"
       >
-        <div className="name-track flex w-max font-display text-[15vw] leading-none whitespace-nowrap md:text-[13vw]">
+        {/* The name in stippled dots that part around the pointer. The text stays,
+            invisible, so the line keeps its size and keeps sliding as before. */}
+        <div className="name-track flex w-max font-display text-[15vw] font-extrabold leading-none whitespace-nowrap md:text-[13vw]">
           {NAME_COPIES.map((copy) => (
-            <span key={copy} className="shrink-0 pr-[0.35em]">{site.name} -</span>
+            <span key={copy} className="shrink-0 pr-[0.35em]">
+              <span className="relative inline-block text-transparent">
+                {site.name} -
+                <Dotted source={{ kind: "text", text: `${site.name} -` }} />
+              </span>
+            </span>
           ))}
         </div>
       </motion.div>

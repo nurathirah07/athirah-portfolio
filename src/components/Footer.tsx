@@ -41,7 +41,7 @@ export default function Footer() {
   };
 
   return (
-    <footer data-code="Footer" className="relative z-10 px-6 pb-8 md:px-12">
+    <footer className="relative z-10 px-6 pb-8 md:px-12">
       {showCard && (
         <Reveal>
           <div className="glass relative grid gap-12 overflow-hidden rounded-[2rem] p-8 md:p-14 lg:grid-cols-[1.5fr_1fr] lg:gap-16">

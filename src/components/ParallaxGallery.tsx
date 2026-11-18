@@ -56,7 +56,7 @@ export default function ParallaxGallery({ images }: { images: string[] }) {
   const columns = deal(images);
 
   return (
-    <section aria-hidden data-code="ParallaxGallery" className="-mx-6 md:-mx-12">
+    <section aria-hidden className="-mx-6 md:-mx-12">
       <div ref={ref} className={`relative flex gap-[2vw] overflow-hidden p-[2vw] ${reduce ? "" : "h-[150vh] md:h-[175vh]"}`}>
         {columns.map((items, c) => (
           <Column key={c} items={items} y={ys[c]} start={START[c]} index={c} still={reduce} />

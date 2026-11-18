@@ -80,9 +80,8 @@ cards that stack or move while scrolling, like the Work stack), `.glass-dark` (n
 | Shots strip | `components/ShotRail.tsx` | Machine `drifting / focused / dragging` (`data-mode`) |
 | Footer | `components/Footer.tsx` | Glass CTA card: `RiseText` heading, Magnetic "Send a message", copy-email button, roll links, "Back to top" via `scrollToY`. (The giant footer name was removed at Athirah's request; don't bring it back) |
 | Curtain name | `components/Curtain.tsx` | The name shows in the middle while the screen is fully covered (driven by the disc's size, no extra state) |
+| Dotted | `components/Dotted.tsx` | Draws a line of text (extra-bold) or a photo (halftone: denser where lighter) as thousands of fine stippled dots that part around the pointer and spring back. Fills its positioned parent, which may move (marquee, parallax). Used for the home hero's sliding name and the two echoes beside the portrait. Redraws only while dots are moving |
 | Reels | `components/VideoBackdrop.tsx` | The one video component (6.3). Machine `idle → loading → paused ⇄ playing`, plus `failed`; `data-state="still"` when it shows the poster only. Used by the `/work` cards, the project page's full-screen opening (`ProjectIntro`), the home cards (`videoMode="hover"`) and the previous/next links |
-| Story mode | `components/StoryMode.tsx`, `lib/siteMode.ts` | Picked with **Site / Story** in the dock (reference: the video `public/animations/example of dashboard.mp4`). The dark site gives way to a cream page while thousands of dots gather into the name (they part around the pointer); below: the tagline with its first clause in extra-bold, the true numbers from `careerFacts()` (they flicker, then settle), and the services as tabs that move on by themselves with line drawings that draw themselves in. Esc, "Site" or a page change go back. Machine `site → entering → story → leaving`; the normal site is `inert` meanwhile and the Code view is off. Copy comes only from `site.ts` |
-| Dock + Code view | `components/Dock.tsx`, `components/CodeView.tsx`, `lib/codeView.ts` | 5.1–5.2. The dock is always shown on `md+`: `</>`, a divider, then Site / Story with a cream pill sliding to the current one. The shared machine lives in `lib/codeView.ts`; the code comes from `scripts/code-snippets.mjs` (run by `predev` and `prebuild`) into `data/code-snippets.json`. Mark a new section with `data-code="Name"` and add it to that script's `SECTIONS` |
 
 **House conventions to keep:**
 - Reveal / hover ease: `[0.22, 1, 0.36, 1]`. Page-level ease (curtain, menu): `[0.76, 0, 0.24, 1]`.
@@ -173,54 +172,10 @@ big type, lots of space and one thing at a time, so the moving work is what you 
 
 For a developer portfolio this is the strongest idea of the three: it shows that you can build, not just that you can design. Build it like this:
 
-### 5.1 The dock
-- `components/Dock.tsx`: a `glass-dark` pill fixed at the bottom centre (`bottom-[max(1rem,env(safe-area-inset-bottom))]`), shown on `md+` after the hero (fades in when the hero has scrolled 60% away).
-- It has one control for now: the **Code view** toggle (an `</>` icon button, label "Show the code" / "Hide the code" on a hover tooltip).
-  Leave room for a later Mira button (open the assistant) and a sound toggle, but don't add them now.
-- Wrap it in `Magnetic`. Buttons use the cursor's link state.
-
-### 5.2 Code view — the transition
-State machine `off → entering → on → leaving → off` (`components/CodeView.tsx`, `data-phase` on its root;
-add a row to the AGENTS.md table). Events: `TOGGLE`, `ENTERED`, `LEFT`, `ESC`. `TOGGLE` is ignored mid-transition.
-
-**Entering (≈0.9s total), in this order:**
-1. **Blueprint columns sweep down**: 12 columns (6 below `lg`) the height of the viewport, `fixed inset-0 z-[140]`,
-   each `bg-spruce/10` with a 1px `cream/10` right edge. They run `scaleY 0 → 1` from the top, `origin-top`,
-   0.5s, stagger 0.035s, ease `[0.76,0,0.24,1]`.
-2. **The page dims**: one overlay `bg-ink/55` fades in (0.4s). Don't use CSS `filter` on `<main>`; it repaints the whole page.
-3. **Section outlines**: every element with `data-code="ComponentName"` gets a 1px dashed `gold/60` outline drawn
-   *around* it (an absolutely placed box measured with `getBoundingClientRect`, updated on scroll and resize, not
-   an outline on the element itself). A small mono tag sits on its top-left corner:
-   `<Hero> · 738px · 56 elements`, typed in letter by letter (0.012s per character).
-4. **Panel slides in**: `glass-dark` panel, `fixed right-4 top-20 bottom-24 w-[380px]`, `x: 110% → 0`, spring 260/30.
-
-**On:**
-- Panel top — **"Measured in your browser, right now"**, with live numbers:
-  - **Largest paint**: `PerformanceObserver('largest-contentful-paint')`
-  - **Layout shift**: sum of `layout-shift` entries without recent input
-  - **Page weight**: `performance.getEntriesByType('resource')` `transferSize` + navigation
-  - **Frames / s**: rAF counter, updated every 500ms
-  - **Elements**: `document.querySelectorAll('*').length`
-
-  Numbers count up when they change (`animate` from the old value to the new one, 0.4s).
-- Panel bottom — **the code of the section under the pointer**: file path (`src/components/Hero.tsx`) plus its
-  first comment block and the first ~25 lines, in `font-mono text-xs`, with simple keyword colouring
-  (gold strings, spruce keywords, cream/60 comments). Hovering a different outlined section crossfades the code
-  (0.25s). On touch, tap a section to show its code.
-  - The code comes from a **build-time JSON**: `scripts/code-snippets.mjs` reads every file listed by a `data-code`
-    name and writes `src/data/code-snippets.json`. It runs before `dev` and `build`, the way `predev` runs the
-    voice script. Never fetch source at runtime.
-  - The comments in this repo are written in plain sentences describing what visitors see, so they double as
-    the explanation. Keep writing them that way.
-- `Esc`, the toggle, or a route change → `leaving`.
-
-**Leaving (≈0.6s):** panel out (`x → 110%`), outlines and tags fade (0.2s), the dim fades, then the columns retract
-`scaleY 1 → 0` from the **bottom** (`origin-bottom`), with the stagger reversed.
-
-**Rules:** desktop and tablet only (`md+`). It's off for reduced motion only in the sense that steps 1 and 4 become
-fades; the view itself still works. Scroll stays active while it's on, so you can scroll and inspect.
-Mark sections with `data-code` on: `Hero`, the intro section, `ProjectCard` grid, `ParallaxGallery`,
-`ExpertiseList`, `Marquee`, `ProjectStack`, `ShotRail`, `Footer`, `Assistant`.
+### 5.1–5.2 The dock and the Code view: removed
+Both were built (a `</>` dock button that turned the page into a live blueprint) and later removed at
+Athirah's request, together with a light "Story" mode. Don't add a dock or mode switch back. What she
+kept from that reference is the stippled dot style, now on the home hero (`Dotted`, section 2).
 
 ### 5.3 Pinned showcase (home "Featured projects", optional, after 7.1–7.5)
 Replaces the 3-card grid on the home page only. `/work` keeps `ProjectStack`.
@@ -312,7 +267,7 @@ title over it), the first frame works as the poster, and no visitor or customer 
    so it doesn't count toward the 2-playing limit.
 4. **3** Copy pass in `site.ts` and `projects.json` in the new voice. **Waiting for Athirah to approve the wording**,
    and for the facts the `story` lines need (who uses each project, what happened after).
-5. ~~**5.1–5.2** The dock and the Code view, plus `scripts/code-snippets.mjs`.~~ Done.
+5. ~~**5.1–5.2** The dock and the Code view.~~ Built, then removed at Athirah's request (see 5.1–5.2).
 6. ~~**6.2** Phone and "both" layouts in the generator.~~ Done. Still to do: live recordings where a project can run locally.
    The generator converts frames to the standard ("tv") colour range: without it some ffmpeg builds produce VP9
    Chrome can't decode and H.264 that Safari shows washed out.
@@ -347,7 +302,6 @@ the section 1 rules won:
 - Animate only `transform`, `opacity` and `clip-path`. Use `will-change` only on elements that animate on scroll (as in `ProjectStack`).
 - Images through `next/image` with real `sizes`. Gallery tiles are lazy.
 - **Video:** only through `VideoBackdrop`; muted, `playsInline`, `preload="none"`, poster always set, at most 2 playing, paused off screen and in hidden tabs, poster only for reduced motion and Save-Data. A reel is never the only place information appears (it's `aria-hidden`; the text says what it shows).
-- **Code view:** keyboard reachable (the dock button, `Esc` to leave, focus moves to the panel and back), and the panel is `role="dialog"` with `aria-label="Code view"`.
 - After each change, run `npx tsc --noEmit -p .` and `npx eslint src scripts`, and `npm test` if you touched `src/lib/machine.ts`.
 
 ## 11. Don't
@@ -357,4 +311,4 @@ the section 1 rules won:
 - Don't use `window.addEventListener("scroll")` for animation. Use Motion `useScroll`.
 - Don't copy any reference site's text, names, photos, projects or code.
 - Don't put a bare `<video>` in a page, autoplay with sound, or burn text into reels.
-- Don't fake numbers, in copy or in the Code view. Every metric shown must be measured live or be true.
+- Don't fake numbers in copy. Every number shown must be true.

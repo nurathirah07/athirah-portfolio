@@ -19,7 +19,7 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
   const facts = [project.kind, project.year, platformName[project.platform]];
 
   return (
-    <section data-code="ProjectIntro" className="relative -mx-6 -mt-32 flex h-svh min-h-[38rem] items-center justify-center overflow-hidden md:-mx-12">
+    <section className="relative -mx-6 -mt-32 flex h-svh min-h-[38rem] items-center justify-center overflow-hidden md:-mx-12">
       {/* The reel, dimmed and darker at the edges, fading into the page below */}
       <VideoBackdrop video={project.video} fallback={project.shots[0]} dim={0.5} />
       {/* Darkest in the middle, behind the words, and fading into the page below */}

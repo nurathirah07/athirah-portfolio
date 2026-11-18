@@ -224,7 +224,7 @@ export default function ProjectStack() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
   return (
-    <section id="projects" data-code="ProjectStack" aria-label="Projects" className="relative mt-8">
+    <section id="projects" aria-label="Projects" className="relative mt-8">
       <div ref={ref} className="flex flex-col gap-[8svh] pb-[6svh]">
         {projects.map((p, i) => (
           <Card key={p.slug} p={p} index={i} progress={scrollYProgress} />
