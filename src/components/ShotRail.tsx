@@ -8,7 +8,9 @@ import { deviceOf, type Platform, type Shot } from "@/data/site";
 const SPEED = 55; // px per second while drifting
 const FRICTION = 3.2; // how quickly a flick dies away (higher = sooner)
 const NUDGE = 1500; // px per second given by an arrow button
-const DRAG_START = 6; // px of movement before a press counts as a drag, not a tap
+// Sideways movement before a press counts as a drag, not a tap. Fingers wobble
+// (and the strip drifts under them), so touch gets more room than a mouse.
+const DRAG_START = { mouse: 6, touch: 14 };
 
 // What the visitor is doing with the strip (shown on the element as data-mode):
 // nothing, so it drifts; looking at one screen; or dragging it. One value, so
@@ -34,7 +36,6 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
   const loop = useRef(0); // width of one full set of screens, in px
   const glide = useRef(0); // extra speed from a flick or arrow, px per second (+ moves right)
   const drag = useRef({ active: false, moved: 0, lastX: 0, lastT: 0, speed: 0 });
-  const dragged = useRef(false); // true when the press that just ended was a drag
   const easing = useRef<ReturnType<typeof animate> | null>(null); // the speed change in progress, if any
   const [mode, setMode] = useState<Mode>(DRIFTING);
   const focus = mode.kind === "focused" ? mode.index : null;
@@ -129,7 +130,10 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
   // pan-y on the stage); only sideways movement moves the strip.
   const press = (e: React.PointerEvent) => {
     if (reduce || (e.pointerType === "mouse" && e.button !== 0)) return;
-    dragged.current = false;
+    const touch = e.pointerType !== "mouse";
+    // The screen under the finger, if any: a touch that doesn't turn into a
+    // drag focuses it when the finger lifts.
+    const shot = (e.target as Element).closest<HTMLElement>("li[data-index]");
     drag.current = { active: false, moved: 0, lastX: e.clientX, lastT: e.timeStamp, speed: 0 };
 
     const move = (ev: PointerEvent) => {
@@ -139,9 +143,8 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       d.moved += Math.abs(dx);
       d.lastX = ev.clientX;
       d.lastT = ev.timeStamp;
-      if (!d.active && d.moved > DRAG_START) {
+      if (!d.active && d.moved > DRAG_START[touch ? "touch" : "mouse"]) {
         d.active = true;
-        dragged.current = true;
         glide.current = 0;
         setMode(DRAGGING);
       }
@@ -156,7 +159,11 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       window.removeEventListener("pointerup", release);
       window.removeEventListener("pointercancel", release);
       const d = drag.current;
-      if (!d.active) return;
+      if (!d.active) {
+        // A tap. (pointercancel means the browser took over to scroll the page.)
+        if (touch && ev.type === "pointerup" && shot) tap(Number(shot.dataset.index), shot);
+        return;
+      }
       d.active = false;
       setMode((m) => (m.kind === "dragging" ? DRIFTING : m));
       // A pause before letting go means "place it here", not a flick.
@@ -238,11 +245,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
                 // Copies after the first set are only there to fill the loop.
                 aria-hidden={i >= shots.length || undefined}
                 onPointerEnter={(e) => e.pointerType === "mouse" && !drag.current.active && hold(i)}
-                onClick={(e) => {
-                  // A drag ends with a click too; only a clean tap should focus.
-                  if (dragged.current || reduce || (e.nativeEvent as PointerEvent).pointerType === "mouse") return;
-                  tap(i, e.currentTarget);
-                }}
+                data-index={i}
                 className={`shrink-0 px-4 transition-[scale,opacity,filter] duration-500 ease-out md:px-7 ${
                   grabbing ? "scale-[0.97]" : focus === null ? "" : on ? "relative z-10 scale-110" : "scale-95 opacity-35 blur-[3px]"
                 }`}
