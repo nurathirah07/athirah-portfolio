@@ -1,6 +1,7 @@
 import ExpertiseList from "@/components/ExpertiseList";
 import Hero from "@/components/Hero";
 import Marquee from "@/components/Marquee";
+import ParallaxGallery from "@/components/ParallaxGallery";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
 import ProjectCard from "@/components/ProjectCard";
@@ -57,6 +58,10 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      <div className={SECTION}>
+        <ParallaxGallery />
+      </div>
 
       {/* A light, matte panel: a change of surface from the dark glass around it */}
       <section className={`matte rounded-[2rem] p-6 md:p-14 ${SECTION}`}>

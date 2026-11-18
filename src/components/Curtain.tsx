@@ -1,10 +1,11 @@
 "use client";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { animate, motion, useMotionTemplate, useMotionValue } from "motion/react";
+import { animate, motion, useMotionTemplate, useMotionValue, useTransform } from "motion/react";
 import { CURTAIN_EVENT, type CurtainRequest } from "@/components/TransitionLink";
 import type { Transitions } from "@/lib/machine";
 import { useMachine } from "@/lib/useMachine";
+import { site } from "@/data/site";
 
 const EASE = [0.76, 0, 0.24, 1] as const;
 const DURATION = 0.6;
@@ -48,6 +49,12 @@ export default function Curtain() {
   const at = trip ? `${trip.x}px ${trip.y}px` : "50% 50%";
   const discClip = useMotionTemplate`circle(${disc}px at ${at})`;
   const rimClip = useMotionTemplate`circle(${rim}px at ${at})`;
+  // The name shows in the middle only while the screen is fully covered: it
+  // fades in over the last stretch of the disc growing, and out as soon as the
+  // disc starts to close.
+  const full = useMotionValue(1); // this trip's full radius
+  const nameOpacity = useTransform([disc, full], ([v, f]: number[]) => Math.min(1, Math.max(0, (v - f * 0.92) / (f * 0.08))));
+  const nameY = useTransform(nameOpacity, [0, 1], [8, 0]);
 
   // A link was clicked.
   useEffect(() => {
@@ -77,6 +84,7 @@ export default function Curtain() {
     if (phase.name === "covering") {
       const { trip } = phase;
       let giveUp: ReturnType<typeof setTimeout> | undefined;
+      full.set(trip.radius);
       animate(rim, trip.radius, { duration: DURATION, ease: EASE });
       animate(disc, trip.radius, { duration: DURATION, delay: RING, ease: EASE }).then(() => {
         // Only move on once the screen is really covered, and if this is still
@@ -94,7 +102,7 @@ export default function Curtain() {
         if (rim.get() <= 1) curtain.send({ type: "UNCOVERED" });
       });
     }
-  }, [phase, disc, rim, router, curtain]);
+  }, [phase, disc, rim, full, router, curtain]);
 
   return (
     <div aria-hidden data-phase={phase.name} className="pointer-events-none fixed inset-0 z-200" style={{ visibility: trip ? "visible" : "hidden" }}>
@@ -103,6 +111,9 @@ export default function Curtain() {
         style={{ clipPath: discClip }}
         className="absolute inset-0 bg-[#020a06] bg-[radial-gradient(60rem_40rem_at_70%_20%,rgb(19_111_99/0.35),transparent_70%)]"
       />
+      <motion.p style={{ opacity: nameOpacity, y: nameY }} className="absolute inset-0 grid place-items-center font-display text-lg text-cream/75">
+        {site.name}
+      </motion.p>
     </div>
   );
 }

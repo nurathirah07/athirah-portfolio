@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import FooterName from "@/components/FooterName";
 import Magnetic from "@/components/Magnetic";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
@@ -41,7 +42,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative z-10 px-6 pb-24 md:px-12 md:pb-8">
+    <footer className="relative z-10 px-6 pb-8 md:px-12">
       {showCard && (
         <Reveal>
           <div className="glass relative grid gap-12 overflow-hidden rounded-[2rem] p-8 md:p-14 lg:grid-cols-[1.5fr_1fr] lg:gap-16">
@@ -109,6 +110,8 @@ export default function Footer() {
           <RollText>Back to top</RollText>
         </button>
       </div>
+
+      <FooterName />
     </footer>
   );
 }

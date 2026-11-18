@@ -3,18 +3,17 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import TransitionLink from "@/components/TransitionLink";
+import Menu from "@/components/Menu";
 import RollText from "@/components/RollText";
 import { site } from "@/data/site";
 
 // On wide screens Contact is reached through the "Let's talk" button, so it
-// isn't repeated in the links. On phones it is a fourth tab instead, within
-// thumb reach, and the button is hidden.
+// isn't repeated in the links. Phones and tablets use the full-screen Menu.
 const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/work", label: "Work" },
 ];
-const tabs = [...links, { href: "/contact", label: "Contact" }];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const SPRING = { type: "spring", stiffness: 400, damping: 32 } as const;
@@ -22,7 +21,7 @@ const SPRING = { type: "spring", stiffness: 400, damping: 32 } as const;
 // Site navigation.
 // - Wide screens: the name on the left, a floating glass pill of links in the
 //   middle (a gold pill slides to the current page) and a "Let's talk" button.
-// - Phones: the same links as a tab bar within thumb reach at the bottom.
+// - Phones and tablets: a menu button that opens a full-screen menu (Menu).
 // A thin line across the very top shows how far down the page you are.
 export default function Nav() {
   const path = usePathname();
@@ -75,25 +74,7 @@ export default function Nav() {
         </TransitionLink>
       </motion.header>
 
-      <nav
-        aria-label="Mobile"
-        className="glass-dark fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[60] grid grid-cols-4 rounded-full p-1 md:hidden"
-      >
-        {tabs.map((l) => {
-          const active = isActive(l.href);
-          return (
-            <TransitionLink
-              key={l.href}
-              href={l.href}
-              aria-current={active ? "page" : undefined}
-              className={`relative rounded-full py-3 text-center font-accent text-[13px] transition-colors duration-300 ${active ? "text-ink" : "text-cream/75"}`}
-            >
-              {active && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-gold" transition={SPRING} />}
-              <span className="relative">{l.label}</span>
-            </TransitionLink>
-          );
-        })}
-      </nav>
+      <Menu />
     </>
   );
 }

@@ -144,7 +144,7 @@ export default function Assistant() {
     // `spoken` is rebuilt every render; lineId identifies the line.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lineId, seen, thinking]);
-  // On a phone a long question can push the answers under the bottom tab bar,
+  // On a phone a long question can push the answers below the screen,
   // and a short one after it can leave the question under the header. Once
   // the answers have appeared, scroll the least needed to show both; if they
   // can't both fit, the start of the question wins.
@@ -157,8 +157,8 @@ export default function Assistant() {
       const question = answers.current?.previousElementSibling?.getBoundingClientRect();
       if (!box || !question || box.height === 0) return;
       const header = 72;
-      const tabBar = 96;
-      const least = box.bottom - (window.innerHeight - tabBar); // answers fully shown
+      const bottomGap = 24; // breathing room at the bottom edge
+      const least = box.bottom - (window.innerHeight - bottomGap); // answers fully shown
       const most = question.top - header; // question still below the header
       const by = least > most ? most : Math.max(least, Math.min(0, most));
       if (Math.abs(by) > 4) window.scrollBy({ top: by, behavior: reduce ? "auto" : "smooth" });
@@ -688,7 +688,7 @@ function Welcome({ onStart }: { onStart: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="mb-14 grid w-full grid-cols-[1fr_auto_1fr] items-end gap-4 font-accent text-[13px] md:mb-0"
+        className="grid w-full grid-cols-[1fr_auto_1fr] items-end gap-4 font-accent text-[13px]"
       >
         <a href={links[0]?.href} target="_blank" rel="noreferrer" className={`justify-self-start py-3 text-cream/70 md:text-cream/50 hover:text-gold ${links[0] ? "" : "invisible"}`}>
           {links[0]?.label}

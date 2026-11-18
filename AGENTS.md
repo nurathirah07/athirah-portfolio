@@ -18,6 +18,7 @@ Anything with more than two states is an explicit state machine, not a set of bo
 | Mira's questions | `steps`, `nextStep`, `previousStep`, `withAnswer`, `withoutAnswer` in `src/data/assistant.ts` | greeting … summary | `data-step` (same section) |
 | In-browser voice | `live` in `src/lib/miraVoice.ts` | off, unavailable, loading, ready, failed | `voiceStatus()` |
 | Page transition | `src/components/Curtain.tsx` | idle, covering, revealing | `data-phase` on the curtain |
+| Phone and tablet menu | `src/components/Menu.tsx` | closed, opening, open, closing | `data-phase` on `#site-menu` |
 | Screens strip | `Mode` in `src/components/ShotRail.tsx` | drifting, focused, dragging | `data-mode` on the strip |
 
 In browser tests, wait on these attributes (for Mira: `data-phase="asking"` and `data-ready="true"`) instead of sleeping or reading CSS classes.

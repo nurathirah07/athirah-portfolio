@@ -92,7 +92,8 @@ export default function ProjectCard({ p }: { p: Project }) {
         <h3 className="mt-4 font-display text-2xl leading-tight transition-colors duration-300 group-hover:text-gold md:text-3xl">{p.title}</h3>
         <p className="mb-6 mt-3 text-[15px] leading-relaxed text-cream/80 md:text-sm md:text-cream/75">{p.summary}</p>
         <div className="mt-auto flex flex-wrap items-end justify-between gap-4">
-          <ul className="flex flex-wrap gap-1.5">
+          {/* Desktop: the tags slide up into view when the card is pointed at or focused. Phones always show them. */}
+          <ul className="flex flex-wrap gap-1.5 transition-[translate,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:translate-y-3 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-focus-within:translate-y-0 md:group-focus-within:opacity-100">
             {p.tech.slice(0, 3).map((t) => (
               <li key={t} className="chip">{t}</li>
             ))}

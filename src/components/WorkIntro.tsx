@@ -96,7 +96,7 @@ export default function WorkIntro() {
       <h1 className="sr-only">My projects</h1>
       <WorkBackdrop />
 
-      <div className="absolute inset-x-0 bottom-36 top-24 md:bottom-24 [--tile-k:2] md:[--tile-k:1]">
+      <div className="absolute inset-x-0 bottom-24 top-24 [--tile-k:2] md:[--tile-k:1]">
         <AnimatePresence>
           {current.tiles.map((t, i) => {
             const img = workTiles[t.img % workTiles.length];
@@ -146,7 +146,7 @@ export default function WorkIntro() {
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-6 pb-28 font-accent md:pb-8 text-[13px] text-cream/60 md:px-12">
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-6 pb-8 font-accent text-[13px] text-cream/60 md:px-12">
         <span className="whitespace-nowrap">({Math.min(...years)} – {Math.max(...years)})</span>
         <span className="text-right">{projects.length} projects, scroll to explore</span>
       </div>

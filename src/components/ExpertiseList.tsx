@@ -38,9 +38,11 @@ export default function ExpertiseList() {
           <li
             key={s.name}
             onPointerEnter={(e) => e.pointerType === "mouse" && setActive(i)}
-            className="group border-b border-ink/15 transition-colors duration-300 hover:bg-ink"
+            className="group relative overflow-hidden border-b border-ink/15"
           >
-            <Reveal className="grid gap-2 px-3 py-5 md:grid-cols-[1fr_1fr] md:items-center md:gap-8 md:px-5 md:py-6">
+            {/* On hover a dark fill rises up the row from its bottom edge */}
+            <span aria-hidden className="absolute inset-0 origin-bottom scale-y-0 bg-ink transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-y-100 group-focus-within:scale-y-100" />
+            <Reveal className="relative z-10 grid gap-2 px-3 py-5 md:grid-cols-[1fr_1fr] md:items-center md:gap-8 md:px-5 md:py-6">
               <h3 className="text-xl font-semibold transition-[color,translate] duration-300 group-hover:translate-x-2 group-hover:text-gold md:text-2xl">{s.name}</h3>
               <p className="text-[15px] leading-relaxed text-ink/75 md:text-sm md:leading-normal md:text-ink/65 transition-colors duration-300 group-hover:text-cream/75">{s.detail}</p>
             </Reveal>
