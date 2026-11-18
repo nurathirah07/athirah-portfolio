@@ -58,3 +58,6 @@ next-env.d.ts
 
 # Editor and build leftovers
 /src/data/*.tmp
+
+# Half-written reels while scripts/reel/make_reel.py is rendering
+/public/videos/.tmp-*
