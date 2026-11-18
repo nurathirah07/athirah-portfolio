@@ -48,11 +48,8 @@ export default function Footer() {
             <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgb(224_202_60/0.18),transparent)] blur-2xl" />
 
             <div className="relative">
-              <p className="flex items-center gap-2.5 font-accent text-xs md:text-[11px] text-cream/60">
-                Contact
-              </p>
-              <h2 className="mt-6 max-w-xl font-display text-4xl leading-[1.05] md:text-6xl">
-                <RiseText text="Get in touch" accent="touch" />
+              <h2 className="max-w-xl font-display text-4xl leading-[1.05] md:text-6xl">
+                <RiseText text="Get in touch" />
               </h2>
               <div className="mt-10 flex flex-wrap items-center gap-4">
                 <Magnetic>
@@ -67,14 +64,14 @@ export default function Footer() {
                   className="rounded-full border border-cream/20 px-6 py-4 text-sm transition-colors duration-300 hover:border-gold hover:text-gold"
                 >
                   <span aria-live="polite">{copied ? "Copied ✓" : site.email}</span>
-                  {!copied && <span className="ml-3 font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/45">Copy</span>}
+                  {!copied && <span className="ml-3 font-accent text-[13px] text-cream/65">Copy</span>}
                 </button>
               </div>
             </div>
 
             <div className="relative grid grid-cols-2 gap-8 text-sm lg:pt-2">
               <nav aria-label="Footer">
-                <p className="font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/45">Pages</p>
+                <p className="font-accent text-[13px] text-cream/65">Pages</p>
                 <ul className="mt-3">
                   {pages.map((p) => (
                     <li key={p.href}>
@@ -84,7 +81,7 @@ export default function Footer() {
                 </ul>
               </nav>
               <div>
-                <p className="font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/45">Elsewhere</p>
+                <p className="font-accent text-[13px] text-cream/65">Elsewhere</p>
                 <ul className="mt-3">
                   {socials.map((s) => (
                     <li key={s.label}>
@@ -106,10 +103,10 @@ export default function Footer() {
         </Reveal>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/50">
-        <span>© 2026 {site.name} · {site.location}</span>
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 font-accent text-[13px] text-cream/65">
+        <span>© 2026 {site.name}, {site.location}</span>
         <button type="button" onClick={() => scrollToY(0, 1)} className="py-3 font-accent hover:text-gold">
-          <RollText>Back to top ↑</RollText>
+          <RollText>Back to top</RollText>
         </button>
       </div>
     </footer>

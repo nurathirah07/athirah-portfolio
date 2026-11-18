@@ -21,7 +21,7 @@ function Collage({ p }: { p: Project }) {
         <p aria-hidden className="absolute -bottom-4 left-4 right-4 font-display text-[18vw] leading-none text-cream/10 md:text-[7vw]">
           {p.title.split(" ")[0]}
         </p>
-        <span className="absolute left-5 top-5 rounded-full border border-cream/15 bg-ink/40 px-3 py-1 font-accent text-xs md:text-[10px] text-cream/70 backdrop-blur">Screenshots coming soon</span>
+        <span className="absolute left-5 top-5 rounded-full border border-cream/15 bg-ink/40 px-3 py-1 font-accent text-[13px] text-cream/70 backdrop-blur">Screenshots coming soon</span>
         {/* A small terminal-style card listing the stack */}
         <div className="absolute inset-0 grid place-items-center p-6">
           <div className="w-full max-w-sm rounded-xl border border-cream/10 bg-ink/70 shadow-[0_30px_60px_-25px_rgb(0_0_0/0.9)] backdrop-blur transition-transform duration-700 group-hover:-translate-y-1">
@@ -146,21 +146,16 @@ function Card({ p, index, progress }: { p: Project; index: number; progress: Mot
       {/* will-change: the card is scaled on the graphics chip as you scroll, not repainted every frame. */}
       <motion.article
         style={{ scale }}
-        className="group relative grid will-change-transform h-full w-full origin-top grid-rows-[auto_minmax(0,1fr)] gap-6 overflow-hidden rounded-[1.75rem] border border-cream/20 bg-[#08291e] p-6 md:border-cream/10 md:bg-[#04170e] shadow-[0_-20px_60px_-30px_rgb(0_0_0/0.9)] md:p-10 lg:grid-cols-[0.85fr_1.15fr] lg:grid-rows-1 lg:gap-12"
+        className="group relative grid will-change-transform h-full w-full origin-top grid-rows-[auto_minmax(0,1fr)] gap-6 overflow-hidden rounded-[1.75rem] glass-solid p-6 md:p-10 lg:grid-cols-[0.85fr_1.15fr] lg:grid-rows-1 lg:gap-12"
       >
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_30rem_at_0%_0%,rgb(19_111_99/0.18),transparent_60%)]" />
 
         <div className="relative flex min-h-0 flex-col">
-          {/* On phones the card is short, so the number sits in this line instead of on its own row. */}
-          <p className="font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/55">
-            <span aria-hidden className="text-gold md:hidden">0{index + 1} / 0{N} · </span>
-            {p.kind} · {p.year}
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-cream/70">
+            <span>{p.kind}</span>
+            <span aria-hidden className="h-1 w-1 rounded-full bg-cream/35" />
+            <span className="tabular-nums">{p.year}</span>
           </p>
-          <p aria-hidden className="mt-6 hidden font-display text-7xl leading-none text-gold md:block">
-            0{index + 1}
-            <span className="ml-2 align-top font-accent text-xs text-cream/70 md:text-cream/40">/ 0{N}</span>
-          </p>
-          <h2 className="mt-3 font-display text-3xl leading-tight md:mt-6 md:text-5xl">
+          <h2 className="mt-3 font-display text-3xl leading-tight md:mt-5 md:text-5xl">
             <TransitionLink href={`/work/${p.slug}`} className="transition-colors duration-300 hover:text-gold">{p.title}</TransitionLink>
           </h2>
           <p className="mt-3 max-w-md text-[15px] leading-relaxed text-cream/80 md:mt-4 md:text-cream/75 md:text-base">{p.summary}</p>
@@ -171,7 +166,7 @@ function Card({ p, index, progress }: { p: Project; index: number; progress: Mot
             <div className="hidden md:block"><Label>Built with</Label></div>
             <ul aria-label="Built with" className="flex flex-wrap gap-2 md:mt-3">
               {p.tech.map((t) => (
-                <li key={t} className="rounded-full border border-spruce bg-spruce/10 px-3 py-1 font-accent text-xs md:text-[11px]">{t}</li>
+                <li key={t} className="chip">{t}</li>
               ))}
             </ul>
           </div>

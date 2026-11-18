@@ -40,8 +40,7 @@ export default function ExpertiseList() {
             onPointerEnter={(e) => e.pointerType === "mouse" && setActive(i)}
             className="group border-b border-ink/15 transition-colors duration-300 hover:bg-ink"
           >
-            <Reveal className="grid gap-2 px-3 py-5 md:grid-cols-[auto_1fr_1fr] md:items-center md:gap-8 md:px-5 md:py-6">
-              <span className="font-accent text-xs md:text-[11px] text-ink/45 transition-colors duration-300 group-hover:text-gold">0{i + 1}</span>
+            <Reveal className="grid gap-2 px-3 py-5 md:grid-cols-[1fr_1fr] md:items-center md:gap-8 md:px-5 md:py-6">
               <h3 className="text-xl font-semibold transition-[color,translate] duration-300 group-hover:translate-x-2 group-hover:text-gold md:text-2xl">{s.name}</h3>
               <p className="text-[15px] leading-relaxed text-ink/75 md:text-sm md:leading-normal md:text-ink/65 transition-colors duration-300 group-hover:text-cream/75">{s.detail}</p>
             </Reveal>

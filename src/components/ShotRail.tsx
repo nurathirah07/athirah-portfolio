@@ -215,12 +215,12 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       <div className="flex items-end justify-between gap-6 px-6 md:px-12">
         <div>
           <h2 className="font-display text-3xl md:text-5xl">
-            <RiseText text="The screens" accent="screens" />
+            <RiseText text="The screens" />
           </h2>
-          <p className="mt-2 font-accent text-xs text-cream/70 md:text-cream/50 md:text-[11px]">
-            {String(shots.length).padStart(2, "0")} screens ·{" "}
-            <span className="hidden sm:inline">Drag to slide · Hover to focus · Click to enlarge</span>
-            <span className="sm:hidden">Swipe to slide · Tap to focus, again to enlarge</span>
+          <p className="mt-2 text-[13px] text-cream/65">
+            {shots.length} screens.{" "}
+            <span className="hidden sm:inline">Drag to slide, point at one to focus it, click to enlarge.</span>
+            <span className="sm:hidden">Swipe to slide, tap one to focus it, tap again to enlarge.</span>
           </p>
         </div>
         {!reduce && (
@@ -269,7 +269,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
                 )}
                 {/* On the screen in focus: a reminder that it opens full size */}
                 {on && (
-                  <span aria-hidden className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-gold/40 bg-ink/80 px-3 py-1 font-accent text-xs text-gold md:text-[10px]">
+                  <span aria-hidden className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-gold/40 bg-ink/80 px-3 py-1 font-accent text-[13px] text-gold ">
                     <span className="md:hidden">Tap again to enlarge</span>
                     <span className="hidden md:inline">Click to enlarge</span>
                   </span>

@@ -66,7 +66,7 @@ export default function Cursor() {
       }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
     >
-      <span className={`font-accent text-xs md:text-[10px] text-ink transition-opacity duration-200 ${mode === "label" ? "opacity-100" : "opacity-0"}`}>{label}</span>
+      <span className={`font-accent text-[13px] text-ink transition-opacity duration-200 ${mode === "label" ? "opacity-100" : "opacity-0"}`}>{label}</span>
     </motion.div>
   );
 }

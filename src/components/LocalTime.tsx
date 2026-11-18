@@ -16,13 +16,12 @@ export default function LocalTime() {
   const time = useSyncExternalStore(subscribe, () => format.format(new Date()).toUpperCase(), () => "");
   return (
     <>
-      UTC+8
       {time && (
         <>
-          <span aria-hidden className="mx-2 text-cream/55 md:text-cream/30">·</span>
-          <time className="tabular-nums">{time}</time> <span className="text-cream/70 md:text-cream/50">now</span>
+          <time className="tabular-nums">{time}</time> <span className="text-cream/70 md:text-cream/50">now, </span>
         </>
       )}
+      UTC+8
     </>
   );
 }

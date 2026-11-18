@@ -6,12 +6,15 @@ import TransitionLink from "@/components/TransitionLink";
 import RollText from "@/components/RollText";
 import { site } from "@/data/site";
 
-// Contact is reached through the "Let's talk" button, so it isn't repeated here.
+// On wide screens Contact is reached through the "Let's talk" button, so it
+// isn't repeated in the links. On phones it is a fourth tab instead, within
+// thumb reach, and the button is hidden.
 const links = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/work", label: "Work" },
 ];
+const tabs = [...links, { href: "/contact", label: "Contact" }];
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const SPRING = { type: "spring", stiffness: 400, damping: 32 } as const;
@@ -54,7 +57,7 @@ export default function Nav() {
                 key={l.href}
                 href={l.href}
                 aria-current={active ? "page" : undefined}
-                className={`relative rounded-full px-5 py-2.5 font-accent text-xs md:text-[11px] transition-colors duration-300 ${active ? "text-ink" : "text-cream/70 hover:text-cream"}`}
+                className={`relative rounded-full px-5 py-2.5 font-accent text-sm transition-colors duration-300 ${active ? "text-ink" : "text-cream/75 hover:text-cream"}`}
               >
                 {active && <motion.span layoutId="nav-pill" className="absolute inset-0 rounded-full bg-gold" transition={SPRING} />}
                 <span className="relative">{l.label}</span>
@@ -66,7 +69,7 @@ export default function Nav() {
         <TransitionLink
           href="/contact"
           aria-current={path === "/contact" ? "page" : undefined}
-          className="roll-plain btn-gloss rounded-full px-5 py-2.5 font-accent text-xs md:text-[11px]"
+          className="roll-plain btn-gloss hidden rounded-full px-5 py-2.5 font-accent text-sm md:inline-flex"
         >
           <RollText>Let&apos;s talk</RollText>
         </TransitionLink>
@@ -74,16 +77,16 @@ export default function Nav() {
 
       <nav
         aria-label="Mobile"
-        className="glass-dark fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[60] grid grid-cols-3 rounded-full p-1 md:hidden"
+        className="glass-dark fixed inset-x-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[60] grid grid-cols-4 rounded-full p-1 md:hidden"
       >
-        {links.map((l) => {
+        {tabs.map((l) => {
           const active = isActive(l.href);
           return (
             <TransitionLink
               key={l.href}
               href={l.href}
               aria-current={active ? "page" : undefined}
-              className={`relative rounded-full py-3 text-center font-accent text-xs md:text-[11px] transition-colors duration-300 ${active ? "text-ink" : "text-cream/70"}`}
+              className={`relative rounded-full py-3 text-center font-accent text-[13px] transition-colors duration-300 ${active ? "text-ink" : "text-cream/75"}`}
             >
               {active && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-gold" transition={SPRING} />}
               <span className="relative">{l.label}</span>

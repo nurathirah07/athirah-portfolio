@@ -146,9 +146,9 @@ export default function WorkIntro() {
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-6 pb-28 font-accent md:pb-8 text-xs md:text-[11px] text-cream/60 md:px-12">
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-6 pb-28 font-accent md:pb-8 text-[13px] text-cream/60 md:px-12">
         <span className="whitespace-nowrap">({Math.min(...years)} – {Math.max(...years)})</span>
-        <span className="text-right">0{projects.length} projects · Scroll to explore ↓</span>
+        <span className="text-right">{projects.length} projects, scroll to explore</span>
       </div>
     </section>
   );

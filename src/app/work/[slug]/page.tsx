@@ -39,9 +39,9 @@ function Neighbour({ project, label, arrow }: { project: Project; label: string;
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50">{label}</span>
+        <span className="block font-accent text-[13px] text-cream/65">{label}</span>
         <span className="mt-1.5 block truncate font-display text-xl transition-colors duration-300 group-hover:text-gold md:text-2xl">{project.title}</span>
-        <span className="mt-1 block text-xs text-cream/70 md:text-cream/55">{project.kind} · {project.year}</span>
+        <span className="mt-1 block text-xs text-cream/70 md:text-cream/55">{project.kind}, {project.year}</span>
       </span>
       <span
         aria-hidden
@@ -69,9 +69,9 @@ function Detail({ slug }: { slug: string }) {
       <section aria-label="More projects" className="mt-24 lg:mt-32">
         <Reveal className="flex items-end justify-between gap-6">
           <h2 className="font-display text-3xl md:text-5xl">
-            <RiseText text="More projects" accent="projects" />
+            <RiseText text="More projects" />
           </h2>
-          <TransitionLink href="/work" className="font-accent text-xs text-gold"><RollText>All projects →</RollText></TransitionLink>
+          <TransitionLink href="/work" className="font-accent text-xs text-gold"><RollText>See all projects</RollText></TransitionLink>
         </Reveal>
         <div className="mt-8 grid gap-4 md:grid-cols-2 md:gap-6">
           <Reveal><Neighbour project={prev} label="Previous project" arrow="←" /></Reveal>

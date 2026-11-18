@@ -32,7 +32,9 @@ export default function ViewButton({
           large ? "h-11 w-11 text-xl md:h-12 md:w-12" : "h-8 w-8 text-sm"
         } ${card ? "group-hover:-rotate-45 group-hover:bg-ink group-hover:text-gold" : ""}`}
       >
-        →
+        <svg viewBox="0 0 16 16" fill="none" className={large ? "h-5 w-5" : "h-3.5 w-3.5"}>
+          <path d="M3 8h9.5M8.5 3.5 13 8l-4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </span>
     </TransitionLink>
   );

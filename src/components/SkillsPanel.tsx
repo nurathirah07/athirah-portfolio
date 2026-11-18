@@ -31,7 +31,6 @@ export default function SkillsPanel() {
                 aria-expanded={on}
                 className="group flex w-full items-baseline gap-5 py-5 text-left md:gap-8 md:py-6"
               >
-                <span className={`font-accent text-xs md:text-[11px] transition-colors duration-300 ${on ? "text-gold" : "text-cream/70 md:text-cream/40"}`}>0{i + 1}</span>
                 <span className={`flex-1 text-xl font-medium transition-colors duration-300 md:text-3xl ${on ? "text-cream" : "text-cream/70 md:text-cream/45 group-hover:text-cream/80"}`}>
                   {s.name}
                 </span>
@@ -53,8 +52,8 @@ export default function SkillsPanel() {
                     <div className="flex flex-wrap items-baseline justify-between gap-x-8 gap-y-2 pb-6 pl-9 md:pl-13">
                       <p className="max-w-md text-[15px] leading-relaxed text-cream/80 md:text-base md:text-cream/70">{s.detail}</p>
                       {project && (
-                        <TransitionLink href={`/work/${project.slug}`} className="font-accent text-xs md:text-[11px] text-gold">
-                          <RollText>{`${project.title} →`}</RollText>
+                        <TransitionLink href={`/work/${project.slug}`} className="font-accent text-[13px] text-gold">
+                          <RollText>{`See ${project.title}`}</RollText>
                         </TransitionLink>
                       )}
                     </div>
@@ -67,8 +66,8 @@ export default function SkillsPanel() {
       </ul>
 
       <div className="lg:sticky lg:top-28 lg:self-start">
-        <p className="font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/50">
-          Tools · <span className="text-gold" aria-live="polite">{used.size} used for {current.name}</span>
+        <p className="font-accent text-[13px] text-cream/65">
+          <span aria-live="polite">Tools I use for {current.name.toLowerCase()} <span className="text-cream">({used.size})</span></span>
         </p>
         <ul className="mt-5 grid grid-cols-2 gap-x-8 border-t border-cream/12 sm:grid-cols-3">
           {site.skills.map((tool) => {

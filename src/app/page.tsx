@@ -6,7 +6,6 @@ import RiseText from "@/components/RiseText";
 import ProjectCard from "@/components/ProjectCard";
 import RollText from "@/components/RollText";
 import ScrollWords from "@/components/ScrollWords";
-import SectionHead from "@/components/SectionHead";
 import TransitionLink from "@/components/TransitionLink";
 import { site, projects } from "@/data/site";
 
@@ -26,21 +25,21 @@ export default function Home() {
       <Hero />
 
       <section className={SECTION}>
-        <SectionHead index="01" label="Introduction" />
-        <div className="mt-10 grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-end lg:gap-20">
+        <h2 className="sr-only">Introduction</h2>
+        <div className="grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-end lg:gap-20">
           <ScrollWords text={site.statement} className="text-3xl leading-tight md:text-5xl" />
           <Reveal>
             <dl className="glass rounded-3xl p-6">
               {facts.map((f) => (
                 <div key={f.label} className="border-b border-cream/10 py-4 first:pt-0">
-                  <dt className="font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50">
+                  <dt className="text-sm text-cream/65">
                     {f.label}
                   </dt>
                   <dd className="mt-1.5 text-sm font-medium leading-snug">{f.value}</dd>
                 </div>
               ))}
-              <TransitionLink href="/about" className="mt-5 inline-block font-accent text-xs md:text-[11px] text-gold">
-                <RollText>More about me →</RollText>
+              <TransitionLink href="/about" className="mt-5 inline-block py-1 font-accent text-sm text-gold">
+                <RollText>More about me</RollText>
               </TransitionLink>
             </dl>
           </Reveal>
@@ -48,22 +47,20 @@ export default function Home() {
       </section>
 
       <section className={SECTION}>
-        <SectionHead index="02" label="Selected work" />
-        <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-display text-4xl md:text-6xl"><RiseText text="Featured projects" accent="projects" /></h2>
-          <TransitionLink href="/work" className="font-accent text-xs text-gold"><RollText>{`All ${projects.length} projects →`}</RollText></TransitionLink>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <h2 className="font-display text-4xl md:text-6xl"><RiseText text="Featured projects" /></h2>
+          <TransitionLink href="/work" className="py-1 font-accent text-sm text-gold"><RollText>{`See all ${projects.length} projects`}</RollText></TransitionLink>
         </div>
         <div className="mt-10 grid gap-6 lg:grid-cols-3">
           {projects.slice(0, 3).map((p, i) => (
-            <Reveal key={p.slug} delay={i * 0.1}><ProjectCard p={p} index={i} /></Reveal>
+            <Reveal key={p.slug} delay={i * 0.1}><ProjectCard p={p} /></Reveal>
           ))}
         </div>
       </section>
 
       {/* A light, matte panel: a change of surface from the dark glass around it */}
       <section className={`matte rounded-[2rem] p-6 md:p-14 ${SECTION}`}>
-        <SectionHead index="03" label="Expertise" tone="ink" />
-        <div className="mt-10 grid gap-x-10 gap-y-10 lg:grid-cols-3">
+        <div className="grid gap-x-10 gap-y-10 lg:grid-cols-3">
           <Reveal>
             <h2 className="font-display text-4xl md:text-5xl"><RiseText text="What I build" /></h2>
             <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-ink/80 md:text-base md:text-ink/70">{site.expertiseIntro}</p>

@@ -1,5 +1,4 @@
 import Journey from "@/components/Journey";
-import Label from "@/components/Label";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
 import SkillsPanel from "@/components/SkillsPanel";
@@ -25,8 +24,7 @@ export default function About() {
       <section className="mt-24 lg:mt-36">
         <div className="flex flex-wrap items-end justify-between gap-x-16 gap-y-8">
           <div>
-            <Reveal><Label>Skills</Label></Reveal>
-            <h2 className="mt-4 font-display text-4xl leading-[1.05] md:text-6xl">
+            <h2 className="font-display text-4xl leading-[1.05] md:text-6xl">
               <RiseText text="What I do" />
             </h2>
           </div>

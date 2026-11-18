@@ -23,7 +23,7 @@ function Media({ p }: { p: Project }) {
       {!main ? (
         <div className="absolute inset-0 grid place-items-center">
           <p aria-hidden className="font-display text-7xl text-cream/10">{p.title.split(" ")[0]}</p>
-          <span className="absolute bottom-4 left-4 rounded-full border border-cream/15 bg-ink/40 px-3 py-1 font-accent text-xs md:text-[10px] text-cream/70 backdrop-blur">Screenshots coming soon</span>
+          <span className="absolute bottom-4 left-4 rounded-full border border-cream/15 bg-ink/40 px-3 py-1 font-accent text-[13px] text-cream/70 backdrop-blur">Screenshots coming soon</span>
         </div>
       ) : site && phone ? (
         <>
@@ -57,7 +57,7 @@ function Media({ p }: { p: Project }) {
 
 // Glass project card with a soft gold spotlight that follows the cursor.
 // The whole card opens the project page.
-export default function ProjectCard({ p, index }: { p: Project; index: number }) {
+export default function ProjectCard({ p }: { p: Project }) {
   const ref = useRef<HTMLElement>(null);
 
   const follow = (e: React.PointerEvent) => {
@@ -85,18 +85,18 @@ export default function ProjectCard({ p, index }: { p: Project; index: number })
       <Media p={p} />
 
       <div className="flex flex-1 flex-col px-2 pb-2 pt-6 md:px-3">
-        <p className="flex items-center justify-between font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/55">
-          <span>0{index + 1} / {p.kind}</span>
-          <span>{p.year}</span>
+        <p className="flex items-center justify-between text-sm text-cream/70">
+          <span>{p.kind}</span>
+          <span className="tabular-nums">{p.year}</span>
         </p>
         <h3 className="mt-4 font-display text-2xl leading-tight transition-colors duration-300 group-hover:text-gold md:text-3xl">{p.title}</h3>
         <p className="mb-6 mt-3 text-[15px] leading-relaxed text-cream/80 md:text-sm md:text-cream/75">{p.summary}</p>
         <div className="mt-auto flex flex-wrap items-end justify-between gap-4">
           <ul className="flex flex-wrap gap-1.5">
             {p.tech.slice(0, 3).map((t) => (
-              <li key={t} className="rounded-full border border-spruce px-2.5 py-1 font-accent text-xs md:text-[10px]">{t}</li>
+              <li key={t} className="chip">{t}</li>
             ))}
-            {p.tech.length > 3 && <li className="px-1 py-1 font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50">+{p.tech.length - 3}</li>}
+            {p.tech.length > 3 && <li className="px-1 py-1 text-xs font-semibold text-cream/70">+{p.tech.length - 3} more</li>}
           </ul>
           <ViewButton href={`/work/${p.slug}`} label={`View ${p.title}`} card />
         </div>

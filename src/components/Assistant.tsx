@@ -389,7 +389,7 @@ export default function Assistant() {
   const pill = "glass rounded-full border px-4 py-2.5 md:px-5 md:py-3 text-sm text-cream/85 transition-colors duration-300 hover:border-gold/60 hover:text-gold md:text-base";
   const field =
     "w-full rounded-2xl border border-cream/12 bg-ink/40 px-4 py-3 text-sm outline-none transition-colors placeholder:text-cream/35 focus:border-gold md:text-base";
-  const label = "mb-1.5 block font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50";
+  const label = "mb-1.5 block font-accent text-[13px] text-cream/65";
   const back = "text-sm text-cream/70 md:text-cream/55 transition-colors hover:text-gold";
 
   return (
@@ -490,7 +490,7 @@ export default function Assistant() {
                 <dl className="glass mb-5 w-full max-w-xl rounded-[1.75rem] px-5 py-2 text-left md:px-6">
                   {filled.map(([name, value, at]) => (
                     <div key={name} className="flex items-start justify-between gap-4 border-b border-cream/10 py-2.5 last:border-0">
-                      <dt className="w-20 shrink-0 pt-0.5 font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50">{name}</dt>
+                      <dt className="w-20 shrink-0 pt-0.5 font-accent text-[13px] text-cream/65">{name}</dt>
                       <dd className="min-w-0 flex-1 break-words text-sm text-cream md:text-base">{value}</dd>
                       <button type="button" data-step={at} onClick={editClicked} aria-label={`Change ${name.toLowerCase()}`} className="shrink-0 text-sm text-cream/70 md:text-cream/45 hover:text-gold">✎</button>
                     </div>
@@ -533,7 +533,7 @@ export default function Assistant() {
                     <input id="mira-type" value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={300} autoComplete="off" placeholder="Or type your answer…" className="min-w-0 flex-1 bg-transparent py-2 text-sm outline-none placeholder:text-cream/40" />
                     <button type="submit" aria-label="Send" className="btn-gloss grid h-9 w-9 shrink-0 place-items-center rounded-full">↑</button>
                   </div>
-                  <p className="mt-2 text-xs md:text-[11px] text-cream/55 md:text-cream/35">Typed messages are read by Google&apos;s Gemini AI. Please don&apos;t include private details.</p>
+                  <p className="mt-2 text-xs text-cream/55">Typed messages are read by Google&apos;s Gemini AI. Please don&apos;t include private details.</p>
                 </form>
               )}
 
@@ -550,7 +550,7 @@ export default function Assistant() {
                     <span className={label}>Your idea (optional)</span>
                     <textarea rows={3} maxLength={600} value={details} onChange={(e) => setDetails(e.target.value)} className={`${field} resize-none`} placeholder="What is it for, who will use it, anything you already have…" />
                   </label>
-                  {aiOn && <p className="mt-2 text-xs md:text-[11px] text-cream/55 md:text-cream/35">This is read by Google&apos;s Gemini AI to word Mira&apos;s reply.</p>}
+                  {aiOn && <p className="mt-2 text-xs text-cream/55">This is read by Google&apos;s Gemini AI to word Mira&apos;s reply.</p>}
                   <div className="mt-4 flex items-center justify-between gap-4">
                     <button type="button" onClick={goBack} className={back}>← Back</button>
                     <div className="flex items-center gap-4">
@@ -688,13 +688,13 @@ function Welcome({ onStart }: { onStart: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="mb-14 grid w-full grid-cols-[1fr_auto_1fr] items-end gap-4 font-accent text-xs md:mb-0 md:text-[11px]"
+        className="mb-14 grid w-full grid-cols-[1fr_auto_1fr] items-end gap-4 font-accent text-[13px] md:mb-0"
       >
         <a href={links[0]?.href} target="_blank" rel="noreferrer" className={`justify-self-start py-3 text-cream/70 md:text-cream/50 hover:text-gold ${links[0] ? "" : "invisible"}`}>
           {links[0]?.label}
         </a>
         <p className="text-center">
-          <span className="block normal-case tracking-normal text-cream/70 md:text-cream/40">(Not a fan of chats?)</span>
+          <span className="block normal-case tracking-normal text-cream/70 md:text-cream/40">Not a fan of chats?</span>
           <a href={`mailto:${site.email}`} className="inline-block py-3 text-cream/80 hover:text-gold">{site.email}</a>
         </p>
         <a href={links[1]?.href} target="_blank" rel="noreferrer" className={`justify-self-end py-3 text-cream/70 md:text-cream/50 hover:text-gold ${links[1] ? "" : "invisible"}`}>
