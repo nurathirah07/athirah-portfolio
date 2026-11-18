@@ -75,12 +75,12 @@ cards that stack or move while scrolling, like the Work stack), `.glass-dark` (n
 | Project stack | `components/ProjectStack.tsx` | Sticky cards that slide over each other; cards underneath shrink and dim; collages spread apart on hover |
 | Project card | `components/ProjectCard.tsx` | Glass card that lifts 6px, with a gold spotlight following the pointer and the device shots rising on hover. On desktop its tags slide up into view on hover or keyboard focus; phones always show them |
 | Expertise list | `components/ExpertiseList.tsx` | A dark fill rises up the row from its bottom edge on hover (and `focus-within`); a project screenshot floats beside the cursor. Rows aren't links, so no arrow |
-| Parallax gallery | `components/ParallaxGallery.tsx` | Home, between Featured projects and What I build: project shots in 4 columns (2 on phones) that slide at different speeds while scrolling past. Fed from `projects[].shots`. Half speed on phones, still with reduced motion |
+| Parallax gallery | `components/ParallaxGallery.tsx`, `lib/gallery.ts` | Home, between Featured projects and What I build: photos in 4 columns (2 on phones) that slide at different speeds while scrolling past. **The photos are whatever is in `public/images/gallery/`** (filename order; tall 2:3 photos look best), not project screenshots. Decorative, so no links. Hidden while the folder is empty. Half speed on phones, still with reduced motion |
 | Marquee | `components/Marquee.tsx` | Tilted amethyst band, 32s loop, pauses on hover |
 | Shots strip | `components/ShotRail.tsx` | Machine `drifting / focused / dragging` (`data-mode`) |
-| Footer | `components/Footer.tsx` | Glass CTA card: `RiseText` heading, Magnetic "Send a message", copy-email button, roll links, "Back to top" via `scrollToY`. Ends with `FooterName`: the name set huge, letters rising in, slower than the page, gold under the pointer |
+| Footer | `components/Footer.tsx` | Glass CTA card: `RiseText` heading, Magnetic "Send a message", copy-email button, roll links, "Back to top" via `scrollToY`. (The giant footer name was removed at Athirah's request; don't bring it back) |
 | Curtain name | `components/Curtain.tsx` | The name shows in the middle while the screen is fully covered (driven by the disc's size, no extra state) |
-| Reels | `components/VideoBackdrop.tsx` | The one video component (6.3). Machine `idle → loading → paused ⇄ playing`, plus `failed`; `data-state="still"` when it shows the poster only. Used by the `/work` cards, the project page's device frame (`Browser video=…`), the home cards (`videoMode="hover"`) and the previous/next links |
+| Reels | `components/VideoBackdrop.tsx` | The one video component (6.3). Machine `idle → loading → paused ⇄ playing`, plus `failed`; `data-state="still"` when it shows the poster only. Used by the `/work` cards, the project page's full-screen opening (`ProjectIntro`), the home cards (`videoMode="hover"`) and the previous/next links |
 | Dock + Code view | `components/Dock.tsx`, `components/CodeView.tsx`, `lib/codeView.ts` | 5.1–5.2. The shared machine lives in `lib/codeView.ts`; the code comes from `scripts/code-snippets.mjs` (run by `predev` and `prebuild`) into `data/code-snippets.json`. Mark a new section with `data-code="Name"` and add it to that script's `SECTIONS` |
 
 **House conventions to keep:**
@@ -295,7 +295,7 @@ title over it), the first frame works as the poster, and no visitor or customer 
 | Place | Now | With a reel |
 |---|---|---|
 | **/work: each `ProjectStack` card** | `glass-solid` card, text left, screenshot collage right | The **card's background becomes the reel** (`VideoBackdrop mode="auto" dim={0.55} dots`), full-bleed inside the rounded card, with an `ink` gradient from the left (`from-ink/95 via-ink/70 to-transparent` across the text column) so the text stays sharp. The collage on the right is **removed** for projects that have a reel (the reel already shows the screens) and kept for those that don't. Keep the stacking scale and dim. The card's dim overlay also dims the video as it's covered |
-| **/work/[slug]: `ProjectIntro` stage** | `bg-[#04170e]` + tech grid behind the device | The reel plays **inside the device frame** (in place of the main screenshot) and, blurred (`blur-2xl scale-110 opacity-40`), as the stage background behind it. Keep the 3D tilt toward the cursor |
+| **/work/[slug]: `ProjectIntro`** | Text beside a device | **The reel is the full-screen background** of the first screen (dim 0.5, ink gradient up from the bottom), with the title in very large extra-bold type, the summary in semibold and the facts and tools as glass chips, over the lower left. No device frame |
 | **Home `ProjectCard` (small cards)** | Device shots rise on hover | `VideoBackdrop mode="hover"` inside the `Browser` frame's screen: poster at rest, plays on hover or focus. Phones: play while centred |
 | **Home pinned showcase (5.3)** | — | Full-screen background with dots |
 | **Neighbour links** (prev/next on project pages) | Thumbnail | Poster; on hover, the reel plays in the thumbnail |
@@ -327,8 +327,8 @@ the section 1 rules won:
 - **3.1 Full-screen menu** (`Menu.tsx`) replaces the phone tab bar. Links have no "01–04" index; the footer
   row is ©, email, GitHub, LinkedIn.
 - **3.2 Expertise rows**: the rising fill, without row numbers or an arrow (the rows aren't links).
-- **3.3 Parallax gallery** (`ParallaxGallery.tsx`), as specified.
-- **3.4 Footer giant name** (`FooterName.tsx`). The footer's bottom padding is `pb-8` now that the tab bar is gone.
+- **3.3 Parallax gallery** (`ParallaxGallery.tsx`), now with photos from `public/images/gallery/` instead of project shots.
+- **3.4 Footer giant name**: built, then removed at Athirah's request. The footer's bottom padding is `pb-8`.
 - **3.5 Curtain name**: shown in sentence case (`font-display`), not tracked capitals.
 - **3.6 Project card details**: the card's own tag chips slide up on hover, rather than a second "A · B · C" line.
 

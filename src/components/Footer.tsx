@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import FooterName from "@/components/FooterName";
 import Magnetic from "@/components/Magnetic";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
@@ -111,7 +110,6 @@ export default function Footer() {
         </button>
       </div>
 
-      <FooterName />
     </footer>
   );
 }

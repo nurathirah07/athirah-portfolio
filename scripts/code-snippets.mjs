@@ -24,6 +24,7 @@ const SECTIONS = {
   ExpertiseList: "src/components/ExpertiseList.tsx",
   Marquee: "src/components/Marquee.tsx",
   ProjectStack: "src/components/ProjectStack.tsx",
+  ProjectIntro: "src/components/ProjectIntro.tsx",
   ShotRail: "src/components/ShotRail.tsx",
   Footer: "src/components/Footer.tsx",
   Assistant: "src/components/Assistant.tsx",

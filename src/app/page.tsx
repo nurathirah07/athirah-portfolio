@@ -9,6 +9,7 @@ import RollText from "@/components/RollText";
 import ScrollWords from "@/components/ScrollWords";
 import TransitionLink from "@/components/TransitionLink";
 import { site, projects } from "@/data/site";
+import { galleryImages } from "@/lib/gallery";
 
 const SECTION = "mt-28 lg:mt-40";
 
@@ -17,6 +18,7 @@ const SECTION = "mt-28 lg:mt-40";
 export default function Home() {
   // The newest chapter of the About page's journey is what she is doing now.
   const now = site.journey[site.journey.length - 1];
+  const gallery = galleryImages();
   const facts = [
     { label: "Now", value: `${now.role.split(",")[0]} at ${now.org}` },
     { label: "Based in", value: site.location },
@@ -61,9 +63,11 @@ export default function Home() {
         </div>
       </section>
 
-      <div className={SECTION}>
-        <ParallaxGallery />
-      </div>
+      {gallery.length > 0 && (
+        <div className={SECTION}>
+          <ParallaxGallery images={gallery} />
+        </div>
+      )}
 
       {/* A light, matte panel: a change of surface from the dark glass around it */}
       <section className={`matte rounded-[2rem] p-6 md:p-14 ${SECTION}`}>
