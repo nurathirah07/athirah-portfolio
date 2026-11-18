@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   experimental: {
+    // Don't reuse dev compilation from disk across restarts: it can keep an
+    // old Tailwind stylesheet that's missing classes from new or changed
+    // components (Mira was invisible because of this). Builds keep their cache.
+    turbopackFileSystemCacheForDev: false,
     serverActions: {
       // Room for several project screenshots in one save from /admin.
       bodySizeLimit: "40mb",

@@ -20,7 +20,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="antialiased">
+    // suppressHydrationWarning: browser extensions (e.g. QuillBot) add their own
+    // attributes to <html> before React starts; this only ignores those, on this one element.
+    <html lang="en" className="antialiased" suppressHydrationWarning>
       <body className="min-h-screen">
         {/* Loading screen, shown once per full page load. Pure CSS, so it appears before any script runs. */}
         <div aria-hidden className="intro">
