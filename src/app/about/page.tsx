@@ -2,20 +2,12 @@ import Journey from "@/components/Journey";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
 import SkillsPanel from "@/components/SkillsPanel";
-import { projects, site } from "@/data/site";
+import { careerFacts, site } from "@/data/site";
 
 export const metadata = { title: `About — ${site.name}` };
 
 export default function About() {
-  // From the first year of the journey to the year of the newest project.
-  // (Worked out from the data, not today's date, so the page can be built ahead of time.)
-  const startYear = Number(site.journey[0].period.slice(0, 4));
-  const latestYear = Math.max(...projects.map((p) => Number(p.year)));
-  const facts = [
-    { value: latestYear - startYear, label: "Years of study and work" },
-    { value: projects.length, label: "Projects" },
-    { value: site.services.length, label: "Service areas" },
-  ];
+  const facts = careerFacts();
 
   return (
     <>

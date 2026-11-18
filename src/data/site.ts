@@ -177,6 +177,21 @@ export const siteUrl = (
 // Projects are edited through /admin (run `npm run dev`), which saves to projects.json.
 export const projects: Project[] = projectData.map(normalizeProject);
 
+/**
+ * The true numbers shown on the About page and in Story mode. Years run from
+ * the first year of the journey to the year of the newest project (worked out
+ * from the data, not today's date, so pages can be built ahead of time).
+ */
+export function careerFacts() {
+  const startYear = Number(site.journey[0].period.slice(0, 4));
+  const latestYear = Math.max(...projects.map((p) => Number(p.year)));
+  return [
+    { value: latestYear - startYear, label: "Years of study and work" },
+    { value: projects.length, label: "Projects" },
+    { value: site.services.length, label: "Service areas" },
+  ];
+}
+
 // Tiles that pop in and out around the title at the top of the Work page:
 // up to 8 landscape-ish screenshots, taken in turn from each project.
 export const workTiles: Shot[] = (() => {
