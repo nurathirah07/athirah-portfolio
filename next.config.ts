@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
+  images: {
+    // 90 for the About page's full-screen photos; everything else uses the default 75.
+    qualities: [75, 90],
+  },
   partialPrefetching: true,
   experimental: {
     // Don't reuse dev compilation from disk across restarts: it can keep an

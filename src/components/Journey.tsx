@@ -66,6 +66,21 @@ function fitted(vw: number, vh: number) {
   return { w: a.r - a.l, h: a.b - a.t };
 }
 
+// How a settled photo is shown, from how its shape compares with the screen's:
+// - "cover": close enough to fill the screen without losing much.
+// - "tall" (a portrait photo on a wide screen): shown whole on the right,
+//   beside the words.
+// - "wide" (much wider than the screen): shown whole as a band across it.
+// Both of the last two sit on a soft, blurred copy of the same photo, so the
+// screen is still filled and nothing is cut off.
+type Fit = "cover" | "tall" | "wide";
+function fitFor(width: number, height: number, vw: number, vh: number): Fit {
+  const off = Math.log(width / height / (vw / vh));
+  if (off < -0.35) return vw >= 1024 ? "tall" : "cover";
+  if (off > 0.35) return "wide";
+  return "cover";
+}
+
 // Scroll position (0-1 through the pinned section) where a photo sits still.
 const progressFor = (frame: number) => (INTRO + EXPAND + (frame + DWELL / 2) * PER_IMAGE) / TOTAL;
 
@@ -76,6 +91,7 @@ function Frame({
   vw,
   vh,
   reduce,
+  fit,
 }: {
   frame: (typeof frames)[number];
   index: number;
@@ -83,6 +99,7 @@ function Frame({
   vw: MotionValue<number>;
   vh: MotionValue<number>;
   reduce: boolean | null;
+  fit: Fit;
 }) {
   // The element is always its final, settled size, so the photo is drawn at
   // full sharpness. The row of panels is made by scaling and clipping it.
@@ -107,9 +124,16 @@ function Frame({
   const y = useTransform(shape, (s) => s.y);
   const scale = useTransform(shape, (s) => s.scale);
   const clipPath = useTransform(shape, (s) => s.clip);
+  // The row of panels shows the photo filling each panel; as it settles, a photo
+  // that doesn't suit the screen's shape fades to its whole, uncropped version.
+  const settled = useTransform(geo, (g) => (fit === "cover" ? 0 : g.e));
+  const croppedOpacity = useTransform(settled, (v) => 1 - v);
+  const img = { quality: 90, priority: true } as const;
 
   return (
-    <motion.div style={{ x, y, scale, width, height }} className="absolute left-0 top-0 will-change-transform">
+    // No will-change here: with it the browser keeps the photo at the small size
+    // it had when the zoom began and stretches that, so it looks blurry.
+    <motion.div style={{ x, y, scale, width, height }} className="absolute left-0 top-0">
       <motion.div
         initial={reduce ? false : { opacity: 0, filter: "blur(14px)" }}
         animate={{ opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
@@ -117,7 +141,31 @@ function Frame({
         className="absolute inset-0"
       >
         <motion.div style={{ clipPath }} className="absolute inset-0 bg-ink">
-          <Image src={frame.src} alt={frame.alt} fill priority sizes="100vw" className="object-cover" style={{ objectPosition: frame.position }} />
+          <motion.div style={{ opacity: croppedOpacity }} className="absolute inset-0">
+            <Image src={frame.src} alt={frame.alt} {...img} fill sizes="100vw" className="object-cover" style={{ objectPosition: frame.position }} />
+          </motion.div>
+          {fit !== "cover" && (
+            <motion.div aria-hidden style={{ opacity: settled }} className="absolute inset-0">
+              {/* A soft, blurred copy fills the screen behind the whole photo */}
+              <Image src={frame.src} alt="" fill sizes="480px" quality={75} className="scale-110 object-cover opacity-70 blur-2xl" />
+              <div
+                className={
+                  fit === "tall"
+                    ? "absolute bottom-[10%] left-[52%] right-[4%] top-[15%]"
+                    : "absolute inset-x-0 top-[16%] h-[30%] lg:inset-y-[10%] lg:h-auto"
+                }
+              >
+                <Image
+                  src={frame.src}
+                  alt=""
+                  {...img}
+                  fill
+                  sizes={fit === "tall" ? "50vw" : "100vw"}
+                  className={`object-contain drop-shadow-[0_30px_60px_rgb(0_0_0/0.6)] ${fit === "tall" ? "object-right" : "object-top lg:object-center"}`}
+                />
+              </div>
+            </motion.div>
+          )}
           <div aria-hidden className="absolute inset-0 rounded-[inherit] shadow-[inset_0_0_0_1px_rgb(243_239_221/0.08)]" />
         </motion.div>
       </motion.div>
@@ -134,12 +182,14 @@ export default function Journey() {
   const vw = useMotionValue(1440);
   const vh = useMotionValue(900);
   const [frame, setFrame] = useState(0);
+  const [screen, setScreen] = useState({ w: 1440, h: 900 });
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
   useEffect(() => {
     const size = () => {
       vw.set(window.innerWidth);
       vh.set(window.innerHeight);
+      setScreen({ w: window.innerWidth, h: window.innerHeight });
     };
     size();
     window.addEventListener("resize", size);
@@ -187,7 +237,7 @@ export default function Journey() {
       <div className="sticky top-0 h-svh overflow-hidden">
         <motion.div style={{ clipPath: stageClip }} className="absolute inset-0">
           {frames.map((f, i) => (
-            <Frame key={f.src} frame={f} index={i} geo={geo} vw={vw} vh={vh} reduce={reduce} />
+            <Frame key={f.src} frame={f} index={i} geo={geo} vw={vw} vh={vh} reduce={reduce} fit={fitFor(f.width, f.height, screen.w, screen.h)} />
           ))}
         </motion.div>
 
