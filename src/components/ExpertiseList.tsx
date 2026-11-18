@@ -24,6 +24,7 @@ export default function ExpertiseList() {
 
   return (
     <div
+      data-code="ExpertiseList"
       className="relative lg:col-span-2"
       onPointerMove={(e) => {
         if (e.pointerType !== "mouse") return;

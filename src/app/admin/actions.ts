@@ -1,8 +1,8 @@
 "use server";
 import { redirect } from "next/navigation";
 import { adminEnabled, endSession, isSignedIn, passwordMatches, startSession } from "@/lib/admin/auth";
-import { commitAdminChange, readProjects, removeUnusedUploads, saveUpload, writeProjects } from "@/lib/admin/store";
-import { deviceOf, platforms, type Device, type Platform, type Project, type Shot } from "@/data/site";
+import { commitAdminChange, readProjects, removeUnusedUploads, removeUnusedVideos, savePoster, saveUpload, saveVideo, writeProjects } from "@/lib/admin/store";
+import { deviceOf, platforms, type Device, type Platform, type Project, type Reel, type Shot, type Story } from "@/data/site";
 
 export type FormState = {
   ok?: boolean;
@@ -14,6 +14,7 @@ export type FormState = {
 
 const MAX_FILE = 8 * 1024 * 1024; // 8 MB per image
 const MAX_SHOTS = 12;
+const MAX_STORY = 300; // characters per story line
 
 // Every action re-checks the session itself rather than trusting the page.
 async function requireAdmin() {
@@ -36,6 +37,10 @@ export async function signOut() {
 }
 
 const text = (form: FormData, key: string) => String(form.get(key) ?? "").trim();
+const upload = (form: FormData, key: string) => {
+  const f = form.get(key);
+  return f instanceof File && f.size > 0 ? f : null;
+};
 
 export async function saveProject(_: FormState, form: FormData): Promise<FormState> {
   await requireAdmin();
@@ -91,7 +96,39 @@ export async function saveProject(_: FormState, form: FormData): Promise<FormSta
     else if (f.size > MAX_FILE) fields.files = `${f.name} is over 8 MB.`;
   }
 
+  // The story: three short lines, all or none.
+  const storyLines = { problem: text(form, "storyProblem"), built: text(form, "storyBuilt"), outcome: text(form, "storyOutcome") };
+  const filled = Object.values(storyLines).filter(Boolean).length;
+  if (filled > 0 && filled < 3) fields.story = "Fill in all three lines, or leave them all empty.";
+  else if (Object.values(storyLines).some((line) => line.length > MAX_STORY)) fields.story = `Keep each line under ${MAX_STORY} characters.`;
+  const story: Story | undefined = filled === 3 ? storyLines : undefined;
+
+  // The video: keep the current one unless it's replaced or removed.
+  const removeVideo = form.get("removeVideo") === "on";
+  const mp4File = upload(form, "videoMp4");
+  const webmFile = upload(form, "videoWebm");
+  const posterFile = upload(form, "videoPoster");
+  const current = removeVideo ? undefined : existing?.video;
+  if (mp4File && (mp4File.type !== "video/mp4" || mp4File.size > MAX_FILE)) fields.video = "Use an MP4 file of 8 MB or less.";
+  else if (webmFile && (webmFile.type !== "video/webm" || webmFile.size > MAX_FILE)) fields.video = "Use a WebM file of 8 MB or less.";
+  else if (posterFile && (!posterFile.type.startsWith("image/") || posterFile.size > MAX_FILE)) fields.video = "The poster must be an image of 8 MB or less.";
+  else if (!removeVideo && (webmFile || posterFile) && !mp4File && !current) fields.video = "Add an MP4 too: every browser can play it.";
+  else if (!removeVideo && mp4File && !posterFile && !current) fields.video = "Add a poster image (the video's first frame).";
+
   if (Object.keys(fields).length) return { error: "Please fix the highlighted fields.", fields };
+
+  let video: Reel | undefined = current;
+  if (!removeVideo && (mp4File || webmFile || posterFile)) {
+    try {
+      const mp4 = mp4File ? await saveVideo(mp4File, slug, "mp4") : current!.mp4;
+      // A new MP4 replaces the old pair, so an old WebM of a different video isn't kept.
+      const webm = webmFile ? await saveVideo(webmFile, slug, "webm") : mp4File ? undefined : current?.webm;
+      const poster = posterFile ? await savePoster(posterFile, slug) : current!.poster;
+      video = { mp4, poster, ...(webm ? { webm } : {}) };
+    } catch {
+      return { error: "The video couldn't be saved. Try again.", fields: { video: "Upload failed." } };
+    }
+  }
 
   let uploaded: Shot[];
   try {
@@ -108,10 +145,17 @@ export async function saveProject(_: FormState, form: FormData): Promise<FormSta
   if (platform === "both" && !(shots.some((x) => x.device === "web") && shots.some((x) => x.device === "mobile")) && shots.length > 1) {
     return { error: "Please fix the highlighted fields.", fields: { platform: "For website + mobile, mark at least one image as each. Or pick just one." } };
   }
-  const project: Project = { slug, title, year, kind, summary, tech, platform, shots, ...(link ? { link } : {}) };
+  const project: Project = {
+    slug, title, year, kind, summary, tech, platform, shots,
+    ...(link ? { link } : {}),
+    ...(video ? { video } : {}),
+    ...(story ? { story } : {}),
+  };
   const next = existing ? projects.map((p) => (p === existing ? project : p)) : [project, ...projects];
   await writeProjects(next);
   await removeUnusedUploads((existing?.shots ?? []).map((s) => s.src), next);
+  const old = existing?.video;
+  if (old) await removeUnusedVideos([old.mp4, old.webm, old.poster].filter((s): s is string => !!s), next);
   await commitAdminChange(existing ? `Admin: updated ${title}` : `Admin: added ${title}`);
 
   return { ok: true, slug, message: existing ? "Changes saved." : "Project added." };

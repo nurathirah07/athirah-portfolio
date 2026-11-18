@@ -86,7 +86,12 @@
         "height": 536,
         "alt": "Cozy Crumb screenshot"
       }
-    ]
+    ],
+    "video": {
+      "mp4": "/videos/cozy-crumb.mp4",
+      "webm": "/videos/cozy-crumb.webm",
+      "poster": "/videos/cozy-crumb-poster.webp"
+    }
   },
   {
     "slug": "rentngo",
@@ -125,7 +130,12 @@
         "height": 885,
         "alt": "RentNGo screenshot"
       }
-    ]
+    ],
+    "video": {
+      "mp4": "/videos/rentngo.mp4",
+      "webm": "/videos/rentngo.webm",
+      "poster": "/videos/rentngo-poster.webp"
+    }
   },
   {
     "slug": "biteright",
@@ -268,7 +278,12 @@
         "alt": "HQ Inventory System screenshot"
       }
     ],
-    "link": "https://stock.kaftanasia.com/login"
+    "link": "https://stock.kaftanasia.com/login",
+    "video": {
+      "mp4": "/videos/hq-inventory.mp4",
+      "webm": "/videos/hq-inventory.webm",
+      "poster": "/videos/hq-inventory-poster.webp"
+    }
   },
   {
     "slug": "nrts",
@@ -354,7 +369,12 @@
         "height": 882,
         "alt": "NEKO Repair Tracking System screenshot"
       }
-    ]
+    ],
+    "video": {
+      "mp4": "/videos/nrts.mp4",
+      "webm": "/videos/nrts.webm",
+      "poster": "/videos/nrts-poster.webp"
+    }
   },
   {
     "slug": "weddingsnap",
@@ -419,6 +439,11 @@
         "device": "mobile"
       }
     ],
-    "link": "https://weddingsnap-sepia.vercel.app"
+    "link": "https://weddingsnap-sepia.vercel.app",
+    "video": {
+      "mp4": "/videos/weddingsnap.mp4",
+      "webm": "/videos/weddingsnap.webm",
+      "poster": "/videos/weddingsnap-poster.webp"
+    }
   }
 ]

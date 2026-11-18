@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Cursor from "@/components/Cursor";
+import CodeView from "@/components/CodeView";
 import Curtain from "@/components/Curtain";
+import Dock from "@/components/Dock";
 import Footer from "@/components/Footer";
 import Glow from "@/components/Glow";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -45,6 +47,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Cursor />
         <Nav />
         {/* overflow-x-clip: decorative glows may hang past the edge without widening the page (clip keeps sticky sections working). */}
+        <Dock />
+        <CodeView />
         <main id="content" className="relative z-10 overflow-x-clip px-6 pt-32 pb-24 md:px-12 md:pb-32">{children}</main>
         <Footer />
       </body>

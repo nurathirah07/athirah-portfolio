@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node --no-warnings scripts/mira-voice.mjs",
+    "predev": "node --no-warnings scripts/mira-voice.mjs && node scripts/code-snippets.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "voice": "node --no-warnings scripts/mira-voice.mjs",
-    "test": "node --no-warnings --import ./scripts/test-setup.mjs --test \"src/**/*.test.ts\""
+    "test": "node --no-warnings --import ./scripts/test-setup.mjs --test \"src/**/*.test.ts\"",
+    "prebuild": "node scripts/code-snippets.mjs"
   },
   "dependencies": {
     "@google/genai": "^3.3.0",

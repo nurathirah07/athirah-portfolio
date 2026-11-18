@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { Browser, Phone } from "@/components/DeviceFrames";
 import RollText from "@/components/RollText";
@@ -89,6 +90,10 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
         }}
         className="relative grid h-[58svh] min-h-80 place-items-center overflow-hidden rounded-[2rem] border border-cream/10 bg-[#04170e] perspective-[1400px] lg:h-[68svh]"
       >
+        {/* With a reel: a blurred, faint copy of it fills the stage behind the device */}
+        {project.video && (
+          <Image src={project.video.poster} alt="" fill sizes="60vw" aria-hidden className="scale-110 object-cover opacity-40 blur-2xl" />
+        )}
         <div aria-hidden className="tech-grid absolute inset-0 rounded-[2rem] opacity-60" />
         {/* A soft light that follows the cursor behind the device */}
         <motion.div
@@ -102,7 +107,7 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
         ) : site && phone ? (
           <motion.div style={{ rotateX, rotateY }} className="relative w-[88%] transform-3d">
             <div className="w-[82%]">
-              <Browser shot={site} />
+              <Browser shot={site} video={project.video} />
             </div>
             <div className="absolute -bottom-[6%] right-0 h-[118%] [transform:translateZ(60px)]">
               <Phone shot={phone} className="h-full" />
@@ -119,7 +124,7 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
           </motion.div>
         ) : (
           <motion.div style={{ rotateX, rotateY }} className="relative w-[84%] transform-3d">
-            <Browser shot={main} />
+            <Browser shot={main} video={project.video} />
           </motion.div>
         )}
       </motion.div>

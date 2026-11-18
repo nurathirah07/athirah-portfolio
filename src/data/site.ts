@@ -96,7 +96,14 @@ export type Project = {
   // How the screenshots are framed: in a browser window, a phone, or each in
   // its own (a website with a mobile app; see `device` on each shot).
   platform: Platform;
+  // A short silent loop of the project (see scripts/reel), shown wherever the
+  // project appears large. The poster is its first frame.
+  video?: Reel;
+  // The project page's three short lines: the problem, what was built, what happened.
+  story?: Story;
 };
+export type Reel = { mp4: string; webm?: string; poster: string };
+export type Story = { problem: string; built: string; outcome: string };
 export type Device = "web" | "mobile";
 export type Platform = Device | "both";
 export const platforms: Platform[] = ["web", "mobile", "both"];
@@ -127,7 +134,24 @@ export function suggestPlatform(shots: { width: number; height: number }[]): Pla
 // Reads a project from projects.json: fills in the platform for older entries
 // (mobile if most shots are portrait), and keeps a shot's frame only when it
 // is a real one.
-type Stored = Omit<Project, "platform" | "shots"> & { platform?: string; shots: (Omit<Shot, "device"> & { device?: string })[] };
+type Stored = Omit<Project, "platform" | "shots" | "video" | "story"> & {
+  platform?: string;
+  shots: (Omit<Shot, "device"> & { device?: string })[];
+  video?: unknown;
+  story?: unknown;
+};
+const isText = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
+// A video needs at least an MP4 and a poster; a story needs all three lines.
+function readReel(v: unknown): Reel | undefined {
+  if (!v || typeof v !== "object") return undefined;
+  const { mp4, webm, poster } = v as Record<string, unknown>;
+  return isText(mp4) && isText(poster) ? { mp4, poster, ...(isText(webm) ? { webm } : {}) } : undefined;
+}
+function readStory(v: unknown): Story | undefined {
+  if (!v || typeof v !== "object") return undefined;
+  const { problem, built, outcome } = v as Record<string, unknown>;
+  return isText(problem) && isText(built) && isText(outcome) ? { problem, built, outcome } : undefined;
+}
 export function normalizeProject(p: Stored): Project {
   const shots: Shot[] = p.shots.map(({ device, ...shot }) => (device === "web" || device === "mobile" ? { ...shot, device } : shot));
   const platform: Platform =
@@ -136,7 +160,10 @@ export function normalizeProject(p: Stored): Project {
       : shots.length > 0 && shots.filter(isPortrait).length * 2 > shots.length
         ? "mobile"
         : "web";
-  return { ...p, shots, platform };
+  const { video, story, ...rest } = p;
+  const reel = readReel(video);
+  const lines = readStory(story);
+  return { ...rest, shots, platform, ...(reel ? { video: reel } : {}), ...(lines ? { story: lines } : {}) };
 }
 
 /** The site's public address: the one set above, else Vercel's, else this computer's. */

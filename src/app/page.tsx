@@ -12,6 +12,8 @@ import { site, projects } from "@/data/site";
 
 const SECTION = "mt-28 lg:mt-40";
 
+// The home page: who I am in one screen, a short introduction, three featured
+// projects, a band of screens from every project, what I build, and the tools I use.
 export default function Home() {
   // The newest chapter of the About page's journey is what she is doing now.
   const now = site.journey[site.journey.length - 1];
@@ -25,7 +27,7 @@ export default function Home() {
     <>
       <Hero />
 
-      <section className={SECTION}>
+      <section data-code="Intro" className={SECTION}>
         <h2 className="sr-only">Introduction</h2>
         <div className="grid gap-10 lg:grid-cols-[1fr_20rem] lg:items-end lg:gap-20">
           <ScrollWords text={site.statement} className="text-3xl leading-tight md:text-5xl" />
@@ -52,7 +54,7 @@ export default function Home() {
           <h2 className="font-display text-4xl md:text-6xl"><RiseText text="Featured projects" /></h2>
           <TransitionLink href="/work" className="py-1 font-accent text-sm text-gold"><RollText>{`See all ${projects.length} projects`}</RollText></TransitionLink>
         </div>
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
+        <div data-code="ProjectCard" className="mt-10 grid gap-6 lg:grid-cols-3">
           {projects.slice(0, 3).map((p, i) => (
             <Reveal key={p.slug} delay={i * 0.1}><ProjectCard p={p} /></Reveal>
           ))}

@@ -395,6 +395,7 @@ export default function Assistant() {
   return (
     <section
       ref={root}
+      data-code="Assistant"
       aria-labelledby="assistant-title"
       // For tests and debugging: where the conversation is, and whether Mira has
       // finished her line and the visitor can answer.

@@ -4,6 +4,7 @@ import { motion, useReducedMotion, useScroll, useTransform, type MotionValue } f
 import { Browser, Phone } from "@/components/DeviceFrames";
 import Label from "@/components/Label";
 import TransitionLink from "@/components/TransitionLink";
+import VideoBackdrop from "@/components/VideoBackdrop";
 import ViewButton from "@/components/ViewButton";
 import { projects, shotsFor, type Project, type Shot } from "@/data/site";
 
@@ -148,6 +149,14 @@ function Card({ p, index, progress }: { p: Project; index: number; progress: Mot
         style={{ scale }}
         className="group relative grid will-change-transform h-full w-full origin-top grid-rows-[auto_minmax(0,1fr)] gap-6 overflow-hidden rounded-[1.75rem] glass-solid p-6 md:p-10 lg:grid-cols-[0.85fr_1.15fr] lg:grid-rows-1 lg:gap-12"
       >
+        {/* With a reel, the card's background is the project playing, darkened
+            behind the text so it stays sharp (from the top on phones, the left on wide screens). */}
+        {p.video && (
+          <>
+            <VideoBackdrop video={p.video} fallback={p.shots[0]} dim={0.55} dots vignette={false} />
+            <div aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-b from-ink/95 via-ink/75 to-ink/10 lg:bg-linear-to-r lg:from-ink/95 lg:via-ink/70 lg:to-transparent" />
+          </>
+        )}
 
         <div className="relative flex min-h-0 flex-col">
           <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-cream/70">
@@ -172,9 +181,9 @@ function Card({ p, index, progress }: { p: Project; index: number; progress: Mot
           </div>
         </div>
 
-        {/* The screenshots open the project too; the cursor shows "View" over them. */}
+        {/* The screenshots (or, with a reel, that side of the video) open the project too; the cursor shows "View" over them. */}
         <TransitionLink href={`/work/${p.slug}`} aria-hidden tabIndex={-1} data-cursor-label="View" className="relative block min-h-0">
-          <Collage p={p} />
+          {!p.video && <Collage p={p} />}
         </TransitionLink>
 
         <motion.div aria-hidden style={{ opacity: dim }} className="pointer-events-none absolute inset-0 bg-ink will-change-[opacity]" />
@@ -189,7 +198,7 @@ export default function ProjectStack() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end end"] });
 
   return (
-    <section id="projects" aria-label="Projects" className="relative mt-8">
+    <section id="projects" data-code="ProjectStack" aria-label="Projects" className="relative mt-8">
       <div ref={ref} className="flex flex-col gap-[8svh] pb-[6svh]">
         {projects.map((p, i) => (
           <Card key={p.slug} p={p} index={i} progress={scrollYProgress} />

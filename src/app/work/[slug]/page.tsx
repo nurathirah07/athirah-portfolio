@@ -7,6 +7,7 @@ import RiseText from "@/components/RiseText";
 import RollText from "@/components/RollText";
 import ShotRail from "@/components/ShotRail";
 import TransitionLink from "@/components/TransitionLink";
+import VideoBackdrop from "@/components/VideoBackdrop";
 import { projects, site, type Project } from "@/data/site";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -34,8 +35,11 @@ function Neighbour({ project, label, arrow }: { project: Project; label: string;
       className={`glass glass-hover group flex items-center gap-5 rounded-3xl p-4 md:p-5 ${arrow === "→" ? "flex-row-reverse text-right" : ""}`}
     >
       <span className="relative h-20 w-24 shrink-0 overflow-hidden rounded-2xl border border-cream/10 bg-spruce/20 md:h-24 md:w-32">
-        {thumb && (
-          <Image src={thumb.src} alt="" fill sizes="128px" className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110" />
+        {/* With a reel: its poster, playing while the link is pointed at or focused */}
+        {project.video ? (
+          <VideoBackdrop video={project.video} fallback={thumb} mode="hover" dim={0} vignette={false} sizes="128px" />
+        ) : (
+          thumb && <Image src={thumb.src} alt="" fill sizes="128px" className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110" />
         )}
       </span>
       <span className="min-w-0 flex-1">

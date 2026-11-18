@@ -211,7 +211,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
     "grid h-10 w-10 place-items-center rounded-full border border-cream/20 text-base text-cream/80 transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-ink active:border-flame active:bg-flame";
 
   return (
-    <section aria-label="Screens" className="relative -mx-6 mt-24 md:-mx-12 lg:mt-32">
+    <section aria-label="Screens" data-code="ShotRail" className="relative -mx-6 mt-24 md:-mx-12 lg:mt-32">
       <div className="flex items-end justify-between gap-6 px-6 md:px-12">
         <div>
           <h2 className="font-display text-3xl md:text-5xl">

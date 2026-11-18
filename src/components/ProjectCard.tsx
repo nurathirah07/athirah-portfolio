@@ -28,7 +28,7 @@ function Media({ p }: { p: Project }) {
       ) : site && phone ? (
         <>
           <div className={`absolute inset-x-6 right-[22%] top-7 ${lift}`}>
-            <Browser shot={site} />
+            <Browser shot={site} video={p.video} videoMode="hover" />
           </div>
           <div className={`absolute right-[7%] top-12 h-[140%] ${lift} delay-75`}>
             <Phone shot={phone} className="h-full rotate-3" />
@@ -47,7 +47,7 @@ function Media({ p }: { p: Project }) {
         </>
       ) : (
         <div className={`absolute inset-x-6 top-7 ${lift}`}>
-          <Browser shot={main} />
+          <Browser shot={main} video={p.video} videoMode="hover" />
         </div>
       )}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-[#04170e] to-transparent" />

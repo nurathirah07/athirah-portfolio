@@ -14,7 +14,7 @@ export default function Marquee({ items }: { items: string[] }) {
 
   return (
     // Wider than the page so the tilted ends stay off-screen.
-    <div className="marquee band-gloss -mx-[3%] -rotate-[1.5deg] overflow-hidden py-6 md:py-8">
+    <div data-code="Marquee" className="marquee band-gloss -mx-[3%] -rotate-[1.5deg] overflow-hidden py-6 md:py-8">
       <div className="marquee-track flex w-max">
         {row(false)}
         {row(true)}

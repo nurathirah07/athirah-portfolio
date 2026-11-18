@@ -32,7 +32,7 @@ export default function Hero() {
   const echoRightY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, -130]);
 
   return (
-    <section ref={ref} className="relative -mx-6 -mt-32 h-svh min-h-150 overflow-hidden md:-mx-12">
+    <section ref={ref} data-code="Hero" className="relative -mx-6 -mt-32 h-svh min-h-150 overflow-hidden md:-mx-12">
       <h1 className="sr-only">{site.name}, {site.role}</h1>
 
       {/* Moving gradient that follows the cursor and ripples; sits under everything */}

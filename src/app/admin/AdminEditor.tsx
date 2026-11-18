@@ -420,6 +420,54 @@ function ProjectForm({
         </div>
       </div>
 
+      <fieldset className="space-y-3">
+        <legend className="font-accent text-[11px] text-cream/60">Story (optional)</legend>
+        <p className="text-xs text-cream/45">Three short lines for the project page, facts only. Fill in all three or none.</p>
+        <div className="grid gap-3 md:grid-cols-3">
+          {(
+            [
+              ["storyProblem", "The problem", "What wasn't working, and for whom", project.story?.problem],
+              ["storyBuilt", "What I built", "The thing itself, in one line", project.story?.built],
+              ["storyOutcome", "What happened", "It went live, who uses it, what's next", project.story?.outcome],
+            ] as const
+          ).map(([name, label, placeholder, value]) => (
+            <Field key={name} label={label}>
+              <textarea name={name} defaultValue={value ?? ""} rows={3} maxLength={300} placeholder={placeholder} className={`${input} resize-y`} />
+            </Field>
+          ))}
+        </div>
+        {err.story && <p className="text-xs text-flame">{err.story}</p>}
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className="font-accent text-[11px] text-cream/60">Video (optional)</legend>
+        <p className="text-xs text-cream/45">
+          A short silent loop, shown wherever the project appears large. Make one from the screenshots with{" "}
+          <code className="text-cream/70">python scripts/reel/make_reel.py {project.slug || "your-project"}</code>, or upload your own: MP4 (and optionally WebM), 8 MB each, plus a poster image of the first frame.
+        </p>
+        {project.video && (
+          <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-cream/10 bg-ink/40 p-3">
+            <img src={project.video.poster} alt="" className="h-16 w-28 rounded-lg object-cover" />
+            <span className="min-w-0 flex-1 truncate text-xs text-cream/60">{project.video.mp4}</span>
+            <label className="flex items-center gap-2 text-xs text-cream/70">
+              <input type="checkbox" name="removeVideo" className="accent-flame" /> Remove video
+            </label>
+          </div>
+        )}
+        <div className="grid gap-3 md:grid-cols-3">
+          <Field label={project.video ? "Replace MP4" : "MP4"}>
+            <input type="file" name="videoMp4" accept="video/mp4" className="block w-full text-xs text-cream/70 file:mr-3 file:rounded-full file:border-0 file:bg-cream/10 file:px-3 file:py-1.5 file:text-cream" />
+          </Field>
+          <Field label="WebM (optional)">
+            <input type="file" name="videoWebm" accept="video/webm" className="block w-full text-xs text-cream/70 file:mr-3 file:rounded-full file:border-0 file:bg-cream/10 file:px-3 file:py-1.5 file:text-cream" />
+          </Field>
+          <Field label={project.video ? "Replace poster" : "Poster"}>
+            <input type="file" name="videoPoster" accept="image/png,image/jpeg,image/webp" className="block w-full text-xs text-cream/70 file:mr-3 file:rounded-full file:border-0 file:bg-cream/10 file:px-3 file:py-1.5 file:text-cream" />
+          </Field>
+        </div>
+        {err.video && <p className="text-xs text-flame">{err.video}</p>}
+      </fieldset>
+
       {state.error && !state.ok && <p role="alert" className="text-sm text-flame">{state.error}</p>}
 
       <div className="flex flex-wrap items-center gap-4 border-t border-cream/10 pt-6">

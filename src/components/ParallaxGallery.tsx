@@ -72,7 +72,7 @@ export default function ParallaxGallery() {
   if (!tiles.length) return null;
 
   return (
-    <section aria-label="Screens from my projects" className="-mx-6 md:-mx-12">
+    <section aria-label="Screens from my projects" data-code="ParallaxGallery" className="-mx-6 md:-mx-12">
       <div ref={ref} className={`relative flex gap-[2vw] overflow-hidden p-[2vw] ${reduce ? "" : "h-[150vh] md:h-[175vh]"}`}>
         {columns.map((items, c) => (
           <Column key={c} items={items} y={ys[c]} start={START[c]} index={c} still={reduce} />
