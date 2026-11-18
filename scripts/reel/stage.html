@@ -118,8 +118,10 @@
         const prog = Math.min(u / span, 1);
         const h = im.naturalHeight * (vw / im.naturalWidth);
         const pan = Math.max(0, h - vh) * 0.35 * prog;
+        // A screenshot shorter than its screen is scaled up to fill it (no empty band below).
+        const cover = Math.max(1, vh / h);
         im.style.opacity = o;
-        im.style.transform = `translateY(${-pan}px) scale(${1.05 - 0.05*prog})`;
+        im.style.transform = `translateY(${-pan}px) scale(${cover * (1.05 - 0.05*prog)})`;
         im.style.transformOrigin = "50% 0";
       });
     }

@@ -294,6 +294,8 @@ export default function CodeView() {
         initial={false}
         animate={reduce ? { opacity: opening ? 1 : 0 } : { x: opening ? "0%" : "110%" }}
         transition={reduce ? { duration: 0.3 } : { type: "spring", stiffness: 260, damping: 30, delay: opening ? 0.35 : 0 }}
+        // Nearly solid, so the page behind never shows through the numbers and code.
+        style={{ background: "linear-gradient(180deg, rgb(10 30 22 / 0.97), rgb(2 14 9 / 0.97))" }}
         className="glass-dark fixed bottom-24 right-4 top-20 z-[146] flex w-[380px] flex-col overflow-hidden rounded-3xl text-cream outline-none"
       >
         <div className="border-b border-cream/10 p-5">

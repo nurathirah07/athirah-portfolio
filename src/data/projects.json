@@ -196,7 +196,12 @@
         "alt": "BiteRight screenshot"
       }
     ],
-    "link": "https://biteright-app.web.app/#/home"
+    "link": "https://biteright-app.web.app/#/home",
+    "video": {
+      "mp4": "/videos/biteright.mp4",
+      "webm": "/videos/biteright.webm",
+      "poster": "/videos/biteright-poster.webp"
+    }
   },
   {
     "slug": "hq-inventory",

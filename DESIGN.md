@@ -80,6 +80,8 @@ cards that stack or move while scrolling, like the Work stack), `.glass-dark` (n
 | Shots strip | `components/ShotRail.tsx` | Machine `drifting / focused / dragging` (`data-mode`) |
 | Footer | `components/Footer.tsx` | Glass CTA card: `RiseText` heading, Magnetic "Send a message", copy-email button, roll links, "Back to top" via `scrollToY`. Ends with `FooterName`: the name set huge, letters rising in, slower than the page, gold under the pointer |
 | Curtain name | `components/Curtain.tsx` | The name shows in the middle while the screen is fully covered (driven by the disc's size, no extra state) |
+| Reels | `components/VideoBackdrop.tsx` | The one video component (6.3). Machine `idle → loading → paused ⇄ playing`, plus `failed`; `data-state="still"` when it shows the poster only. Used by the `/work` cards, the project page's device frame (`Browser video=…`), the home cards (`videoMode="hover"`) and the previous/next links |
+| Dock + Code view | `components/Dock.tsx`, `components/CodeView.tsx`, `lib/codeView.ts` | 5.1–5.2. The shared machine lives in `lib/codeView.ts`; the code comes from `scripts/code-snippets.mjs` (run by `predev` and `prebuild`) into `data/code-snippets.json`. Mark a new section with `data-code="Name"` and add it to that script's `SECTIONS` |
 
 **House conventions to keep:**
 - Reveal / hover ease: `[0.22, 1, 0.36, 1]`. Page-level ease (curtain, menu): `[0.76, 0, 0.24, 1]`.
@@ -301,14 +303,19 @@ title over it), the first frame works as the poster, and no visitor or customer 
 ---
 
 ## 7. To do, in order
-1. **6.1** Add the `video` and `story` fields (+ admin upload) and run the `scripts/reel` generator for every website project.
-2. **6.3** Build `VideoBackdrop` (machine, lazy loading, the 2-playing limit, poster fallbacks).
-3. **6.4** Add reels to the `/work` `ProjectStack` card backgrounds, then the `ProjectIntro` stage, then the home `ProjectCard` hover.
-4. **3** Do a copy pass in `site.ts` and `projects.json` in the new voice (Athirah approves the final wording; the
-   tone table in section 3 shows the direction, not final text).
-5. **5.1–5.2** Build the dock and the Code view transition, plus `scripts/code-snippets.mjs`.
-6. **6.2** Add the phone and "both" layouts to the generator, and live recordings where a project can run locally.
-7. **5.3** Pinned home showcase (optional). **4** Scroll-velocity bend (optional).
+1. ~~**6.1** `video` and `story` fields (+ admin upload) and reels for every project.~~ Done: all six have a reel.
+   The admin edits both; a new upload must come with a poster.
+2. ~~**6.3** `VideoBackdrop`.~~ Done.
+3. ~~**6.4** Reels in the `/work` cards, the `ProjectIntro` stage and the home `ProjectCard` hover~~, plus the
+   previous/next links. Done. The stage's blurred background uses the reel's poster (not a second playing video),
+   so it doesn't count toward the 2-playing limit.
+4. **3** Copy pass in `site.ts` and `projects.json` in the new voice. **Waiting for Athirah to approve the wording**,
+   and for the facts the `story` lines need (who uses each project, what happened after).
+5. ~~**5.1–5.2** The dock and the Code view, plus `scripts/code-snippets.mjs`.~~ Done.
+6. ~~**6.2** Phone and "both" layouts in the generator.~~ Done. Still to do: live recordings where a project can run locally.
+   The generator converts frames to the standard ("tv") colour range: without it some ffmpeg builds produce VP9
+   Chrome can't decode and H.264 that Safari shows washed out.
+7. **5.3** Pinned home showcase (optional). **4** Scroll-velocity bend (optional). Not started.
 
 ---
 

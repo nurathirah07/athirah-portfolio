@@ -49,7 +49,14 @@ for (const [name, file] of Object.entries(SECTIONS)) {
   if (at < 0) at = 0;
   snippets[name] = {
     file,
-    comment: explanation(lines, at).map((l) => l.replace(/^\s*\/\/ ?/, "")).join("\n"),
+    // Joined into paragraphs: the line breaks in the source only fit the editor.
+    // Blank lines and "- " list items keep their own lines.
+    comment: explanation(lines, at)
+      .map((l) => l.replace(/^\s*\/\/ ?/, ""))
+      .join("\n")
+      .replace(/\n(?!\n|\s*- )/g, " ")
+      .replace(/ {2,}/g, " ")
+      .trim(),
     code: lines.slice(at, at + LINES).join("\n"),
     start: at + 1, // line number of the first code line
   };
