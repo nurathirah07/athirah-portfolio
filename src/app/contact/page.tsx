@@ -1,4 +1,5 @@
 import Assistant from "@/components/Assistant";
+import ContactBackdrop from "@/components/ContactBackdrop";
 import Label from "@/components/Label";
 import Reveal from "@/components/Reveal";
 import RollText from "@/components/RollText";
@@ -20,8 +21,7 @@ export default function Contact() {
     <>
       <h1 className="sr-only">Contact {site.name}</h1>
 
-      {/* Soft light behind the conversation */}
-      <div aria-hidden className="pointer-events-none absolute left-1/2 top-24 h-144 w-144 -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(19_111_99/0.28),transparent)] blur-2xl" />
+      <ContactBackdrop />
 
       <Assistant />
 

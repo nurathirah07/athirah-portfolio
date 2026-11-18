@@ -106,6 +106,25 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
 @keyframes drift-b { to { transform: translate(-16%, -12%) scale(0.9); } }
 @keyframes drift-c { to { transform: translate(-20%, -18%) scale(1.25); } }
 
+/* Photographic backdrops (Work intro, Contact). The picture moves slowly
+   and a second copy, mirrored, slides the other way so the light shifts. */
+.scene-pan { animation: scene-pan 34s ease-in-out infinite alternate; }
+.scene-pan-b { animation: scene-pan-b 27s ease-in-out infinite alternate; }
+@keyframes scene-pan { from { transform: scale(1.12) translate(-2.5%, 1%); } to { transform: scale(1.2) translate(2.5%, -1.5%); } }
+@keyframes scene-pan-b { from { transform: scaleY(-1) scale(1.25) translate(4%, 2%); } to { transform: scaleY(-1) scale(1.15) translate(-4%, -2%); } }
+
+/* Light running across the glass flutes on the Contact page */
+.flute-sheen {
+  background: linear-gradient(100deg, transparent 35%, rgb(243 239 221 / 0.5) 50%, transparent 65%) no-repeat;
+  background-size: 60% 100%;
+  mask-image: repeating-linear-gradient(90deg, #000 0 3px, transparent 3px 14px);
+  animation: flute-sheen 11s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+@keyframes flute-sheen {
+  0% { background-position: -80% 0; }
+  70%, 100% { background-position: 180% 0; }
+}
+
 /* About page photo band: soft start mid-screen, gone by the bottom */
 .band-fade {
   mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 62%, transparent 98%);
@@ -345,7 +364,8 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
 
 @media (prefers-reduced-motion: reduce) {
   .intro { display: none; }
-  .marquee-track, .name-track, .scroll-cue, .drift-a, .drift-b, .drift-c, .mira-eye { animation: none; }
+  .marquee-track, .name-track, .scroll-cue, .drift-a, .drift-b, .drift-c, .mira-eye, .scene-pan, .scene-pan-b { animation: none; }
+  .flute-sheen { display: none; }
   .roll-inner { transition: none; }
   .btn-gloss::before, .glass-hover::after { transition: none; }
 }
