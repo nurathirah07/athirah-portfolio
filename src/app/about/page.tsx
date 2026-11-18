@@ -35,7 +35,7 @@ export default function About() {
               {facts.map((f) => (
                 <div key={f.label} className="border-l border-cream/15 pl-4">
                   <dd className="font-display text-3xl leading-none md:text-4xl">{f.value}</dd>
-                  <dt className="mt-2 max-w-24 text-xs leading-snug text-cream/55">{f.label}</dt>
+                  <dt className="mt-2 max-w-24 text-xs leading-snug text-cream/70 md:text-cream/55">{f.label}</dt>
                 </div>
               ))}
             </dl>

@@ -167,6 +167,15 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
     0 24px 60px -24px rgb(0 0 0 / 0.8);
 }
 
+/* Small screens, often seen outdoors: a lighter surface and a clearer edge so
+   cards don't melt into the dark page. */
+@media (max-width: 767px) {
+  .glass {
+    background: linear-gradient(160deg, rgb(243 239 221 / 0.11), rgb(243 239 221 / 0.04) 45%, rgb(19 111 99 / 0.12));
+    border-color: rgb(243 239 221 / 0.2);
+  }
+}
+
 .glass-hover { transition: border-color 0.3s ease, box-shadow 0.3s ease; }
 .glass-hover:hover {
   border-color: rgb(224 202 60 / 0.45);

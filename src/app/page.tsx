@@ -33,13 +33,13 @@ export default function Home() {
             <dl className="glass rounded-3xl p-6">
               {facts.map((f) => (
                 <div key={f.label} className="border-b border-cream/10 py-4 first:pt-0">
-                  <dt className="font-accent text-[10px] text-cream/50">
+                  <dt className="font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50">
                     {f.label}
                   </dt>
                   <dd className="mt-1.5 text-sm font-medium leading-snug">{f.value}</dd>
                 </div>
               ))}
-              <TransitionLink href="/about" className="mt-5 inline-block font-accent text-[11px] text-gold">
+              <TransitionLink href="/about" className="mt-5 inline-block font-accent text-xs md:text-[11px] text-gold">
                 <RollText>More about me →</RollText>
               </TransitionLink>
             </dl>
@@ -66,7 +66,7 @@ export default function Home() {
         <div className="mt-10 grid gap-x-10 gap-y-10 lg:grid-cols-3">
           <Reveal>
             <h2 className="font-display text-4xl md:text-5xl"><RiseText text="What I build" /></h2>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-ink/70 md:text-base">{site.expertiseIntro}</p>
+            <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-ink/80 md:text-base md:text-ink/70">{site.expertiseIntro}</p>
           </Reveal>
           <ExpertiseList />
         </div>

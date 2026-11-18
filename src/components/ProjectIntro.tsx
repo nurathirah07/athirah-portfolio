@@ -33,7 +33,7 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
   return (
     <section className="grid items-center gap-12 lg:min-h-[calc(100svh-12rem)] lg:grid-cols-[1fr_1.05fr] lg:gap-16">
       <div>
-        <motion.nav {...rise(0.2)} aria-label="Breadcrumb" className="flex items-center gap-3 font-accent text-[11px] text-cream/55">
+        <motion.nav {...rise(0.2)} aria-label="Breadcrumb" className="flex items-center gap-3 font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/55">
           <TransitionLink href="/work" className="hover:text-gold"><RollText>Work</RollText></TransitionLink>
           <span aria-hidden className="h-px w-8 bg-cream/25" />
           <span className="text-gold">{pad(index + 1)}</span>
@@ -54,17 +54,17 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
             ["Platform", platformName[project.platform]],
           ].map(([label, value]) => (
             <div key={label} className="px-4 py-4 first:pl-0">
-              <dt className="font-accent text-[10px] text-cream/45">{label}</dt>
+              <dt className="font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/45">{label}</dt>
               <dd className="mt-1.5 text-sm font-medium md:text-base">{value}</dd>
             </div>
           ))}
         </motion.dl>
 
         <motion.div {...rise(0.6)} className="mt-8">
-          <p className="font-accent text-[10px] text-cream/45">Built with</p>
+          <p className="font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/45">Built with</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {project.tech.map((t) => (
-              <li key={t} className="rounded-full border border-spruce bg-spruce/10 px-3 py-1 font-accent text-[10px] md:text-[11px]">{t}</li>
+              <li key={t} className="rounded-full border border-spruce bg-spruce/10 px-3 py-1 font-accent text-xs md:text-[11px]">{t}</li>
             ))}
           </ul>
           {project.link && (
@@ -100,7 +100,7 @@ export default function ProjectIntro({ project, index, total }: { project: Proje
         />
 
         {!main ? (
-          <p className="relative rounded-full border border-cream/15 bg-ink/40 px-4 py-2 font-accent text-[11px] text-cream/70 backdrop-blur">Screenshots coming soon</p>
+          <p className="relative rounded-full border border-cream/15 bg-ink/40 px-4 py-2 font-accent text-xs md:text-[11px] text-cream/70 backdrop-blur">Screenshots coming soon</p>
         ) : site && phone ? (
           <motion.div style={{ rotateX, rotateY }} className="relative w-[88%] transform-3d">
             <div className="w-[82%]">

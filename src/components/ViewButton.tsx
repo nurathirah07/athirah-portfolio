@@ -22,7 +22,7 @@ export default function ViewButton({
       href={href}
       aria-label={label}
       className={`group/view relative z-2 inline-flex shrink-0 items-center whitespace-nowrap rounded-full border-gold/70 bg-gold/5 font-accent text-gold transition-colors duration-300 hover:border-gold hover:bg-gold hover:text-ink focus-visible:border-gold focus-visible:bg-gold focus-visible:text-ink focus-visible:outline-none active:border-flame active:bg-flame active:text-ink ${
-        large ? "gap-5 border-2 py-2 pl-8 pr-2 text-sm md:text-base" : "gap-3 border py-1.5 pl-5 pr-1.5 text-[11px]"
+        large ? "gap-5 border-2 py-2 pl-8 pr-2 text-sm md:text-base" : "gap-3 border py-1.5 pl-5 pr-1.5 text-xs"
       } ${card ? "group-hover:border-gold group-hover:bg-gold group-hover:text-ink group-active:border-flame group-active:bg-flame" : ""}`}
     >
       View project

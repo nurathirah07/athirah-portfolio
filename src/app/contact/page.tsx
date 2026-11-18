@@ -37,7 +37,7 @@ export default function Contact() {
           <dl className="border-t border-cream/12">
             {details.map((d) => (
               <div key={d.label} className="flex items-center justify-between gap-6 border-b border-cream/12 py-4">
-                <dt className="font-accent text-[11px] text-cream/50">{d.label}</dt>
+                <dt className="font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/50">{d.label}</dt>
                 <dd className="text-right text-sm font-medium md:text-base">
                   {d.href ? (
                     <a href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} download={d.href.endsWith(".pdf") ? "Nur Athirah Azmi - Resume.pdf" : undefined} rel="noreferrer" className="-my-3 inline-block py-3 hover:text-gold">

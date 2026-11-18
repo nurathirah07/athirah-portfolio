@@ -39,13 +39,13 @@ function Neighbour({ project, label, arrow }: { project: Project; label: string;
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-accent text-[10px] text-cream/50">{label}</span>
+        <span className="block font-accent text-xs md:text-[10px] text-cream/70 md:text-cream/50">{label}</span>
         <span className="mt-1.5 block truncate font-display text-xl transition-colors duration-300 group-hover:text-gold md:text-2xl">{project.title}</span>
-        <span className="mt-1 block text-xs text-cream/55">{project.kind} · {project.year}</span>
+        <span className="mt-1 block text-xs text-cream/70 md:text-cream/55">{project.kind} · {project.year}</span>
       </span>
       <span
         aria-hidden
-        className={`order-first hidden px-2 text-xl text-cream/50 transition-all duration-300 group-hover:text-gold sm:block ${arrow === "→" ? "group-hover:translate-x-1.5" : "group-hover:-translate-x-1.5"}`}
+        className={`order-first hidden px-2 text-xl text-cream/70 md:text-cream/50 transition-all duration-300 group-hover:text-gold sm:block ${arrow === "→" ? "group-hover:translate-x-1.5" : "group-hover:-translate-x-1.5"}`}
       >
         {arrow}
       </span>

@@ -33,7 +33,7 @@ export default function ContactForm() {
         <button type="submit" className="roll-plain btn-gloss rounded-full px-7 py-3 font-accent">
           <RollText>Send message</RollText>
         </button>
-        <span className="text-sm text-cream/50">Opens in your email app</span>
+        <span className="text-sm text-cream/70 md:text-cream/50">Opens in your email app</span>
       </div>
     </form>
   );

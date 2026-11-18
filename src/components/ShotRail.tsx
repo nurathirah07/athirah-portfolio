@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { animate, motion, useAnimationFrame, useMotionValue, useReducedMotion } from "motion/react";
 import { Browser, Phone } from "@/components/DeviceFrames";
 import RiseText from "@/components/RiseText";
+import ShotViewer from "@/components/ShotViewer";
 import { deviceOf, type Platform, type Shot } from "@/data/site";
 
 const SPEED = 55; // px per second while drifting
@@ -23,6 +24,7 @@ const DRAGGING: Mode = { kind: "dragging" };
 // - Pointing at a screen (or tapping it) slows the strip to a stop, brings that
 //   screen forward and lets the others dim and blur; moving away sets it
 //   drifting again.
+// - Tapping or clicking the focused screen opens it full size (ShotViewer).
 // - To look through faster, drag or swipe the strip, scroll sideways on a
 //   trackpad, or use the arrow buttons. It glides on from a flick, then
 //   settles back into its own drift.
@@ -38,6 +40,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
   const drag = useRef({ active: false, moved: 0, lastX: 0, lastT: 0, speed: 0 });
   const easing = useRef<ReturnType<typeof animate> | null>(null); // the speed change in progress, if any
   const [mode, setMode] = useState<Mode>(DRIFTING);
+  const [viewing, setViewing] = useState<Shot | null>(null); // the screen open full size, if any
   const focus = mode.kind === "focused" ? mode.index : null;
   const grabbing = mode.kind === "dragging";
 
@@ -71,6 +74,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       glide.current = 0;
       pace.set(1);
       setMode(DRIFTING);
+      setViewing(null);
     },
     [pace],
   );
@@ -93,11 +97,12 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
     setPace(i === null ? 1 : 0);
   };
 
-  // Touch: stop at once and slide the tapped screen to the middle. If that would
+  // Touch: tapping the screen already in focus opens it full size. Otherwise
+  // stop at once and slide the tapped screen to the middle. If that would
   // run past either end of the strip, switch to its twin in the other half first
   // (the two halves look identical, so the switch can't be seen).
   const tap = (i: number, el: HTMLElement) => {
-    if (focus === i) return hold(null);
+    if (focus === i) return setViewing(items[i]);
     const half = items.length / 2;
     const box = el.getBoundingClientRect();
     let from = x.get();
@@ -160,8 +165,11 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       window.removeEventListener("pointercancel", release);
       const d = drag.current;
       if (!d.active) {
-        // A tap. (pointercancel means the browser took over to scroll the page.)
-        if (touch && ev.type === "pointerup" && shot) tap(Number(shot.dataset.index), shot);
+        // A tap or click. (pointercancel means the browser took over to scroll the page.)
+        if (ev.type !== "pointerup") return;
+        if (!shot) return touch ? hold(null) : undefined; // a tap beside the screens lets go
+        if (touch) tap(Number(shot.dataset.index), shot);
+        else setViewing(items[Number(shot.dataset.index)]); // a mouse has already focused it by pointing
         return;
       }
       d.active = false;
@@ -209,10 +217,10 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
           <h2 className="font-display text-3xl md:text-5xl">
             <RiseText text="The screens" accent="screens" />
           </h2>
-          <p className="mt-2 font-accent text-[10px] text-cream/50 md:text-[11px]">
+          <p className="mt-2 font-accent text-xs text-cream/70 md:text-cream/50 md:text-[11px]">
             {String(shots.length).padStart(2, "0")} screens ·{" "}
-            <span className="hidden sm:inline">Drag to slide · Hover to focus</span>
-            <span className="sm:hidden">Swipe to slide · Tap to focus</span>
+            <span className="hidden sm:inline">Drag to slide · Hover to focus · Click to enlarge</span>
+            <span className="sm:hidden">Swipe to slide · Tap to focus, again to enlarge</span>
           </p>
         </div>
         {!reduce && (
@@ -246,8 +254,9 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
                 aria-hidden={i >= shots.length || undefined}
                 onPointerEnter={(e) => e.pointerType === "mouse" && !drag.current.active && hold(i)}
                 data-index={i}
-                className={`shrink-0 px-4 transition-[scale,opacity,filter] duration-500 ease-out md:px-7 ${
-                  grabbing ? "scale-[0.97]" : focus === null ? "" : on ? "relative z-10 scale-110" : "scale-95 opacity-35 blur-[3px]"
+                onClick={reduce ? () => setViewing(s) : undefined}
+                className={`relative shrink-0 px-4 transition-[scale,opacity,filter] duration-500 ease-out md:px-7 ${
+                  grabbing ? "scale-[0.97]" : focus === null ? "" : on ? "z-10 scale-110" : "scale-95 opacity-35 blur-[3px]"
                 }`}
               >
                 {deviceOf(s, platform) === "mobile" ? (
@@ -258,11 +267,30 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
                     <Browser shot={s} />
                   </div>
                 )}
+                {/* On the screen in focus: a reminder that it opens full size */}
+                {on && (
+                  <span aria-hidden className="pointer-events-none absolute -bottom-9 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full border border-gold/40 bg-ink/80 px-3 py-1 font-accent text-xs text-gold md:text-[10px]">
+                    <span className="md:hidden">Tap again to enlarge</span>
+                    <span className="hidden md:inline">Click to enlarge</span>
+                  </span>
+                )}
+                {/* For keyboards (and with reduced motion): a button per screen */}
+                {i < shots.length && (
+                  <button
+                    type="button"
+                    onClick={() => setViewing(s)}
+                    className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:left-1/2 focus-visible:top-4 focus-visible:z-20 focus-visible:-translate-x-1/2 focus-visible:whitespace-nowrap focus-visible:rounded-full focus-visible:bg-gold focus-visible:px-4 focus-visible:py-2 focus-visible:font-accent focus-visible:text-xs focus-visible:text-ink"
+                  >
+                    Enlarge screen {i + 1}
+                  </button>
+                )}
               </li>
             );
           })}
         </motion.ul>
       </div>
+
+      <ShotViewer shot={viewing} onClose={() => setViewing(null)} />
     </section>
   );
 }

@@ -196,7 +196,7 @@ export default function Journey() {
         {/* Intro: title above the row of photos, chapter list and scroll cue below it */}
         <motion.div style={{ opacity: introOpacity }} className="pointer-events-none absolute inset-0 flex flex-col justify-between px-6 pb-7 pt-24 md:px-12 md:pt-28">
           <div>
-            <p className="font-accent text-[11px] text-gold">(About)</p>
+            <p className="font-accent text-xs md:text-[11px] text-gold">(About)</p>
             <p aria-hidden className="mt-2 font-display text-5xl leading-none md:text-6xl"><SplitText text="About me" /></p>
           </div>
 
@@ -204,13 +204,13 @@ export default function Journey() {
             <ol className="hidden gap-10 md:flex">
               {stages.map((s, i) => (
                 <li key={s.org} className="border-l border-cream/15 pl-4">
-                  <span className="block font-accent text-[10px] text-gold">0{i + 1}</span>
+                  <span className="block font-accent text-xs md:text-[10px] text-gold">0{i + 1}</span>
                   <span className="mt-1 block text-sm font-medium">{s.short}</span>
-                  <span className="block text-xs text-cream/50">{s.period}</span>
+                  <span className="block text-xs text-cream/70 md:text-cream/50">{s.period}</span>
                 </li>
               ))}
             </ol>
-            <p className="ml-auto flex items-center gap-3 font-accent text-[11px] text-cream/60">
+            <p className="ml-auto flex items-center gap-3 font-accent text-xs md:text-[11px] text-cream/60">
               Scroll to explore
               <span aria-hidden className="relative h-10 w-px overflow-hidden bg-cream/20">
                 <span className="scroll-cue absolute inset-x-0 top-0 h-4 bg-gold" />
@@ -255,7 +255,7 @@ export default function Journey() {
                 type="button"
                 onClick={() => goTo(stageStart(i))}
                 aria-current={on ? "step" : undefined}
-                className={`relative rounded-full px-2 py-2.5 text-center font-accent text-[10px] transition-colors duration-300 md:text-[11px] ${on ? "text-ink" : "text-cream/55 hover:text-cream"}`}
+                className={`relative rounded-full px-2 py-2.5 text-center font-accent text-xs transition-colors duration-300 md:text-[11px] ${on ? "text-ink" : "text-cream/70 md:text-cream/55 hover:text-cream"}`}
               >
                 {/* The gold pill slides between tabs as the chapter changes */}
                 {on && (
@@ -288,18 +288,18 @@ export default function Journey() {
               transition={{ duration: 0.35, ease: EASE }}
               className="flex min-h-0 flex-col lg:my-auto"
             >
-              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-accent text-[10px] md:text-[11px]">
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-accent text-xs md:text-[11px]">
                 <span className="rounded-full border border-gold/40 bg-gold/10 px-3 py-1 text-gold">{stage.period}</span>
-                <span className="text-cream/50">Chapter 0{current.stageIndex + 1} of 0{stages.length}</span>
+                <span className="text-cream/70 md:text-cream/50">Chapter 0{current.stageIndex + 1} of 0{stages.length}</span>
               </p>
               <h2 className="mt-4 font-display text-2xl leading-tight md:mt-5 md:text-4xl">{stage.org}</h2>
-              <p className="mt-1.5 text-sm text-cream/60 md:text-base">{stage.role}</p>
+              <p className="mt-1.5 text-[15px] text-cream/75 md:text-base md:text-cream/60">{stage.role}</p>
               <p className="mt-4 border-l-2 border-gold pl-4 text-lg font-medium leading-snug md:mt-7 md:text-2xl">{stage.headline}</p>
-              <p className="mt-3 text-[13px] leading-relaxed text-cream/75 md:mt-4 md:text-base">{stage.body}</p>
+              <p className="mt-3 text-[15px] leading-relaxed text-cream/80 md:mt-4 md:text-base">{stage.body}</p>
               {/* Tags need a tall screen; on short ones they would run into the photo controls. */}
               <ul className="mt-6 hidden flex-wrap gap-2 [@media(min-height:840px)]:md:flex">
                 {stage.tags.map((t) => (
-                  <li key={t} className="rounded-full border border-spruce bg-spruce/10 px-3 py-1 font-accent text-[10px] text-cream/85">{t}</li>
+                  <li key={t} className="rounded-full border border-spruce bg-spruce/10 px-3 py-1 font-accent text-xs md:text-[10px] text-cream/85">{t}</li>
                 ))}
               </ul>
             </motion.div>
@@ -307,7 +307,7 @@ export default function Journey() {
 
           {/* Step through photos one at a time, or jump straight to one */}
           <div className="mt-4 hidden items-center gap-5 lg:flex">
-            <p className="font-accent text-[11px] text-cream/50">
+            <p className="font-accent text-xs md:text-[11px] text-cream/70 md:text-cream/50">
               <span className="text-base text-gold">0{frame + 1}</span> / 0{N}
             </p>
             <div role="group" aria-label="Photos" className="flex flex-1 gap-1.5">

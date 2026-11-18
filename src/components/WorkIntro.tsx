@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import WorkBackdrop from "@/components/WorkBackdrop";
 import { projects, workTiles } from "@/data/site";
+import { usePhone } from "@/lib/usePhone";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const BEAT_MS = 1700;
@@ -63,6 +64,11 @@ export default function WorkIntro() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const [beat, setBeat] = useState(0);
+  // On a phone the words are much bigger, so they only sway near the middle
+  // instead of crossing the whole screen (and running off its edges).
+  const phone = usePhone();
+  // "My" stays above "Projects" there, so it always reads in order.
+  const place = (w: Word, row: 0 | 1): Word => (phone ? { x: 50 + (w.x - 50) * 0.2, y: (row ? 57 : 43) + (w.y - 50) * 0.1 } : w);
 
   useEffect(() => {
     if (reduce) return;
@@ -80,8 +86,8 @@ export default function WorkIntro() {
 
   const current = BEATS[reduce ? 1 : beat];
   const words: [string, Word][] = [
-    ["My", current.a],
-    ["Projects", current.b],
+    ["My", place(current.a, 0)],
+    ["Projects", place(current.b, 1)],
   ];
   const years = projects.map((p) => Number(p.year));
 
@@ -90,7 +96,7 @@ export default function WorkIntro() {
       <h1 className="sr-only">My projects</h1>
       <WorkBackdrop />
 
-      <div className="absolute inset-x-0 bottom-24 top-24 [--tile-k:2] md:[--tile-k:1]">
+      <div className="absolute inset-x-0 bottom-36 top-24 md:bottom-24 [--tile-k:2] md:[--tile-k:1]">
         <AnimatePresence>
           {current.tiles.map((t, i) => {
             const img = workTiles[t.img % workTiles.length];
@@ -124,8 +130,8 @@ export default function WorkIntro() {
         ))}
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-6 pb-8 font-accent text-[11px] text-cream/60 md:px-12">
-        <span>({Math.min(...years)} – {Math.max(...years)})</span>
+      <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 px-6 pb-28 font-accent md:pb-8 text-xs md:text-[11px] text-cream/60 md:px-12">
+        <span className="whitespace-nowrap">({Math.min(...years)} – {Math.max(...years)})</span>
         <span className="text-right">0{projects.length} projects · Scroll to explore ↓</span>
       </div>
     </section>
@@ -167,7 +173,7 @@ function TrailWord({ word, pos, order, echoes }: { word: string; pos: Word; orde
             transition={{ x: spring, y: spring, opacity: { duration: 0.6, delay: 0.5 + order * 0.15 + li * LETTER_LAG } }}
           >
             <span
-              className={`absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-heavy text-[8vw] leading-none md:text-[6.4vw] ${
+              className={`absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-heavy text-[16vw] leading-none md:text-[6.4vw] ${
                 k === 0 ? "text-cream drop-shadow-[0_6px_30px_rgb(0_15_8/0.9)]" : ""
               }`}
               style={k === 0 ? undefined : { color: mix(t), filter: `blur(${1 + k * 1.4}px)` }}
