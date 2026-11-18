@@ -1,6 +1,7 @@
 import Assistant from "@/components/Assistant";
 import ContactBackdrop from "@/components/ContactBackdrop";
 import Label from "@/components/Label";
+import LocalTime from "@/components/LocalTime";
 import Reveal from "@/components/Reveal";
 import RollText from "@/components/RollText";
 import { site } from "@/data/site";
@@ -11,7 +12,7 @@ export default function Contact() {
   const details = [
     { label: "Email", value: site.email, href: `mailto:${site.email}` },
     { label: "Based in", value: site.location },
-    { label: "Time zone", value: "GMT+8 (Malaysia)" },
+    { label: "Time zone", value: <LocalTime /> },
     { label: "GitHub", value: "View profile ↗", href: site.links.github },
     { label: "LinkedIn", value: "View profile ↗", href: site.links.linkedin },
     { label: "Resume", value: "Download PDF ↓", href: site.links.resume },
