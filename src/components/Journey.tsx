@@ -119,7 +119,7 @@ function Frame({
         className="absolute inset-0"
       >
         <motion.div style={{ clipPath }} className="absolute inset-0 bg-ink">
-          <Image src={frame.src} alt={frame.alt} fill unoptimized priority sizes="60vw" className="object-cover" style={{ objectPosition: frame.position }} />
+          <Image src={frame.src} alt={frame.alt} fill priority sizes="(min-width: 768px) 60vw, 90vw" className="object-cover" style={{ objectPosition: frame.position }} />
           <div aria-hidden className="absolute inset-0 rounded-[inherit] shadow-[inset_0_0_0_1px_rgb(243_239_221/0.08)]" />
         </motion.div>
       </motion.div>

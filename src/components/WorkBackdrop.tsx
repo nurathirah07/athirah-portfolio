@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 import ScenePhoto from "@/components/ScenePhoto";
+import { usePhone } from "@/lib/usePhone";
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 
 // Background for the top of the Work page.
@@ -12,6 +13,9 @@ import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring 
 export default function WorkBackdrop() {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // Phones get the silk and its shading only: the cursor effects have no cursor
+  // to follow there, and every extra full-screen layer costs a phone smoothness.
+  const phone = usePhone();
   const px = useMotionValue(0);
   const py = useMotionValue(0);
   const x = useSpring(px, { stiffness: 90, damping: 20 });
@@ -42,21 +46,24 @@ export default function WorkBackdrop() {
       <div className="absolute inset-x-0 top-0 h-40 bg-linear-to-b from-ink/80 to-transparent" />
       <div className="absolute inset-0 bg-ink/35" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_30%,rgb(0_15_8/0.75))]" />
-      <div className="drift-b absolute -right-[12%] top-[10%] h-[80%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgb(62_47_91/0.55),transparent)] blur-3xl" />
-      <div className="absolute inset-0 grain" />
+      {!phone && (
+        <>
+          <div className="drift-b absolute -right-[12%] top-[10%] h-[80%] w-[50%] rounded-full bg-[radial-gradient(closest-side,rgb(62_47_91/0.55),transparent)] blur-3xl" />
+          <div className="absolute inset-0 grain" />
 
-      {/* Dots that only show near the cursor */}
-      <motion.div
-        style={{ maskImage: reveal, WebkitMaskImage: reveal }}
-        className="absolute inset-0 bg-[radial-gradient(rgb(243_239_221/0.5)_1px,transparent_1.5px)] bg-size-[22px_22px]"
-      />
+          {/* Dots that only show near the cursor */}
+          <motion.div
+            style={{ maskImage: reveal, WebkitMaskImage: reveal }}
+            className="absolute inset-0 bg-[radial-gradient(rgb(243_239_221/0.5)_1px,transparent_1.5px)] bg-size-[22px_22px]"
+          />
 
-      {/* Light that follows the cursor */}
-      <motion.div
-        style={{ x, y }}
-        className="absolute left-0 top-0 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(224_202_60/0.14),rgb(19_111_99/0.12)_55%,transparent)] blur-2xl"
-      />
-
+          {/* Light that follows the cursor */}
+          <motion.div
+            style={{ x, y }}
+            className="absolute left-0 top-0 h-[36rem] w-[36rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(224_202_60/0.14),rgb(19_111_99/0.12)_55%,transparent)] blur-2xl"
+          />
+        </>
+      )}
     </div>
   );
 }

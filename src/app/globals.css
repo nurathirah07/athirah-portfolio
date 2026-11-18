@@ -113,6 +113,16 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
 @keyframes scene-pan { from { transform: scale(1.12) translate(-2.5%, 1%); } to { transform: scale(1.2) translate(2.5%, -1.5%); } }
 @keyframes scene-pan-b { from { transform: scaleY(-1) scale(1.25) translate(4%, 2%); } to { transform: scaleY(-1) scale(1.15) translate(-4%, -2%); } }
 
+/* Work page opener on phones: screenshots pop in, title words fade in.
+   CSS animations, so they run on the graphics chip. */
+.tile-pop { animation: tile-pop 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes tile-pop {
+  from { opacity: 0; transform: scale(0.7) rotate(calc(var(--r, 0deg) * 2)); }
+  to { opacity: 1; transform: scale(1) rotate(var(--r, 0deg)); }
+}
+.word-in { animation: word-in 0.6s ease-out both; }
+@keyframes word-in { from { opacity: 0; } }
+
 /* Light running across the glass flutes on the Contact page */
 .flute-sheen {
   background: linear-gradient(100deg, transparent 35%, rgb(243 239 221 / 0.5) 50%, transparent 65%) no-repeat;
@@ -373,7 +383,7 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
 
 @media (prefers-reduced-motion: reduce) {
   .intro { display: none; }
-  .marquee-track, .name-track, .scroll-cue, .drift-a, .drift-b, .drift-c, .mira-eye, .scene-pan, .scene-pan-b { animation: none; }
+  .marquee-track, .name-track, .scroll-cue, .drift-a, .drift-b, .drift-c, .mira-eye, .scene-pan, .scene-pan-b, .tile-pop, .word-in { animation: none; }
   .flute-sheen { display: none; }
   .roll-inner { transition: none; }
   .btn-gloss::before, .glass-hover::after { transition: none; }

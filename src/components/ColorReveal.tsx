@@ -46,8 +46,21 @@ export default function ColorReveal({
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
     const brush = makeBrush();
+    // The photo as a ready-to-draw bitmap, decoded in the background. Drawing
+    // the plain <img> made the first touch decode it on the spot, which froze
+    // phones for about half a second.
+    let bitmap: ImageBitmap | null = null;
+    let gone = false;
     const photo = new window.Image();
     photo.src = src;
+    photo
+      .decode()
+      .then(() => createImageBitmap(photo))
+      .then((b) => {
+        if (gone) b.close();
+        else bitmap = b;
+      })
+      .catch(() => {});
 
     let stamps: Stamp[] = [];
     let pointer: { x: number; y: number } | null = null;
@@ -73,7 +86,7 @@ export default function ColorReveal({
       ctx.globalAlpha = 1;
       ctx.clearRect(0, 0, w, h);
 
-      if (photo.complete && photo.naturalWidth) {
+      if (bitmap) {
         for (const s of stamps) {
           ctx.globalAlpha = 1 - (now - s.born) / TRAIL_MS;
           ctx.drawImage(brush, s.x - radius, s.y - radius, radius * 2, radius * 2);
@@ -85,7 +98,7 @@ export default function ColorReveal({
         // Keep the photo only where the brush has painted.
         ctx.globalAlpha = 1;
         ctx.globalCompositeOperation = "source-in";
-        ctx.drawImage(photo, 0, 0, w, h);
+        ctx.drawImage(bitmap, 0, 0, w, h);
       }
 
       // Stop the loop once nothing is left to fade.
@@ -137,6 +150,8 @@ export default function ColorReveal({
     wrap.addEventListener("pointercancel", leave);
 
     return () => {
+      gone = true;
+      bitmap?.close();
       cancelAnimationFrame(raf);
       raf = 0;
       observer.disconnect();

@@ -54,7 +54,7 @@ export default function Hero() {
                 width={photos.echo.width}
                 height={photos.echo.height}
                 alt=""
-                unoptimized
+                sizes="(min-width: 768px) 30vw, 70vw"
                 priority
                 className="h-[min(88svh,175vw)] w-auto max-w-none"
               />

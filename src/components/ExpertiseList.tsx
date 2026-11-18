@@ -61,7 +61,7 @@ export default function ExpertiseList() {
               transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
               className={`absolute left-8 -translate-y-1/2 overflow-hidden rounded-2xl border-4 border-cream bg-ink shadow-[0_30px_60px_-20px_rgb(0_0_0/0.6)] ${isPortrait(shot) ? "h-72 w-36" : "h-44 w-72"}`}
             >
-              <Image src={shot.src} alt="" fill unoptimized sizes="288px" className="object-cover object-top" />
+              <Image src={shot.src} alt="" fill sizes="288px" className="object-cover object-top" />
             </motion.div>
           )}
         </AnimatePresence>

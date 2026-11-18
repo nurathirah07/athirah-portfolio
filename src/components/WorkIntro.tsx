@@ -101,6 +101,18 @@ export default function WorkIntro() {
           {current.tiles.map((t, i) => {
             const img = workTiles[t.img % workTiles.length];
             if (!img) return null;
+            // Phones: a CSS pop-in that runs on the graphics chip. The springs
+            // below are driven from JavaScript every frame, which made phones stutter.
+            if (phone)
+              return (
+                <div
+                  key={`${beat}-${i}`}
+                  className="tile-pop absolute -translate-x-1/2 -translate-y-1/2"
+                  style={{ left: `${t.x}%`, top: `${t.y}%`, width: `min(calc(${t.w}% * var(--tile-k)), 420px)`, "--r": `${t.r}deg`, animationDelay: `${i * 0.07}s` } as React.CSSProperties}
+                >
+                  <Image src={img.src} width={img.width} height={img.height} alt="" sizes="45vw" priority className="h-auto w-full rounded-lg border border-cream/10 shadow-[0_24px_50px_-20px_rgb(0_0_0/0.9)]" />
+                </div>
+              );
             return (
               <motion.div
                 key={`${beat}-${i}`}
@@ -116,7 +128,7 @@ export default function WorkIntro() {
                   width={img.width}
                   height={img.height}
                   alt=""
-                  unoptimized
+                  sizes="(min-width: 768px) 30vw, 45vw"
                   priority
                   className="h-auto w-full rounded-lg border border-cream/10 shadow-[0_24px_50px_-20px_rgb(0_0_0/0.9)]"
                 />
@@ -126,7 +138,11 @@ export default function WorkIntro() {
         </AnimatePresence>
 
         {words.map(([word, pos], i) => (
-          <TrailWord key={word} word={word} pos={pos} order={i} echoes={reduce ? 0 : ECHOES} />
+          phone ? (
+            <LiteWord key={word} word={word} pos={pos} order={i} />
+          ) : (
+            <TrailWord key={word} word={word} pos={pos} order={i} echoes={reduce ? 0 : ECHOES} />
+          )
         ))}
       </div>
 
@@ -187,6 +203,24 @@ function TrailWord({ word, pos, order, echoes }: { word: string; pos: Word; orde
           </motion.div>
         );
       })}
+    </div>
+  );
+}
+
+// The phone version of a title word: the whole word glides to its new place
+// with a CSS transition (a slight overshoot stands in for the spring), so the
+// movement runs on the graphics chip. One layer, no echoes.
+function LiteWord({ word, pos, order }: { word: string; pos: Word; order: number }) {
+  return (
+    <div aria-hidden className="word-in pointer-events-none absolute inset-0 z-10" style={{ animationDelay: `${0.5 + order * 0.15}s` }}>
+      <div
+        className="absolute inset-0"
+        style={{ transform: `translate(${pos.x}%, ${pos.y}%)`, transition: `transform 0.8s cubic-bezier(0.34, 1.3, 0.64, 1) ${order * 0.06}s` }}
+      >
+        <span className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-heavy text-[16vw] leading-none text-cream drop-shadow-[0_6px_30px_rgb(0_15_8/0.9)]">
+          {word}
+        </span>
+      </div>
     </div>
   );
 }

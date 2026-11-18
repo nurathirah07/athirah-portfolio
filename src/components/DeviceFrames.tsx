@@ -25,7 +25,7 @@ export function Phone({ shot, className = "", style }: { shot: Shot; className?:
           className="absolute overflow-hidden rounded-[11%/5.2%] bg-ink"
           style={{ inset: `${BEZEL_Y * 100}% ${BEZEL_X * 100}%` }}
         >
-          <Image src={shot.src} alt={shot.alt} fill unoptimized sizes="(min-width: 1024px) 22vw, 45vw" className="object-cover object-top" />
+          <Image src={shot.src} alt={shot.alt} fill sizes="(min-width: 1024px) 22vw, 45vw" className="object-cover object-top" />
           {/* glass reflection */}
           <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(115deg,rgb(255_255_255/0.14)_0%,transparent_32%,transparent_70%,rgb(255_255_255/0.05)_100%)]" />
         </div>
@@ -50,10 +50,10 @@ export function Browser({ shot, className = "", fill = false }: { shot: Shot; cl
       </div>
       {fill ? (
         <div className="relative min-h-0 flex-1">
-          <Image src={shot.src} alt={shot.alt} fill unoptimized sizes="50vw" className="object-cover object-top" />
+          <Image src={shot.src} alt={shot.alt} fill sizes="(min-width: 768px) 50vw, 90vw" className="object-cover object-top" />
         </div>
       ) : (
-        <Image src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} unoptimized className="h-auto w-full" />
+        <Image src={shot.src} alt={shot.alt} width={shot.width} height={shot.height} sizes="(min-width: 768px) 55vw, 90vw" className="h-auto w-full" />
       )}
     </div>
   );

@@ -10,7 +10,8 @@ export default function ContactBackdrop() {
       className="pointer-events-none absolute inset-x-0 top-0 h-[calc(100svh+7rem)] min-h-176 overflow-hidden mask-[linear-gradient(to_bottom,#000_70%,transparent)]"
     >
       <ScenePhoto src="/images/backgrounds/contact.webp" glint={0.22} position="35% 50%" preload />
-      <div className="flute-sheen absolute inset-0 opacity-25 mix-blend-overlay" />
+      {/* Desktop only: on phones it is one more full-screen blended layer */}
+      <div className="flute-sheen absolute inset-0 hidden opacity-25 mix-blend-overlay md:block" />
 
       <div className="absolute inset-0 bg-ink/30" />
       {/* A darker pool in the middle so Mira and her questions stay easy to read */}

@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { usePhone } from "@/lib/usePhone";
 
 // A photograph used as a moving backdrop.
 // - The picture pans and zooms very slowly.
@@ -16,13 +17,15 @@ export default function ScenePhoto({
   preload = false,
 }: {
   src: string;
-  // Opacity of the mirrored copy that makes the light move.
+  // Opacity of the mirrored copy that makes the light move (0 = no copy).
   glint?: number;
   position?: string;
   preload?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  // Phones skip the mirrored copy: one less full-screen blended layer to draw.
+  const phone = usePhone();
   const tx = useMotionValue(0);
   const ty = useMotionValue(0);
   const x = useSpring(tx, { stiffness: 40, damping: 18 });
@@ -45,9 +48,11 @@ export default function ScenePhoto({
       <div className="scene-pan absolute inset-0">
         <Image src={src} alt="" fill sizes="100vw" preload={preload} className="object-cover" style={{ objectPosition: position }} />
       </div>
-      <div className="scene-pan-b absolute inset-0 mix-blend-screen" style={{ opacity: glint }}>
-        <Image src={src} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: position }} />
-      </div>
+      {glint > 0 && !phone && (
+        <div className="scene-pan-b absolute inset-0 mix-blend-screen" style={{ opacity: glint }}>
+          <Image src={src} alt="" fill sizes="100vw" className="object-cover" style={{ objectPosition: position }} />
+        </div>
+      )}
     </motion.div>
   );
 }

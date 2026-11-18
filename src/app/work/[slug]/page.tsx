@@ -35,7 +35,7 @@ function Neighbour({ project, label, arrow }: { project: Project; label: string;
     >
       <span className="relative h-20 w-24 shrink-0 overflow-hidden rounded-2xl border border-cream/10 bg-spruce/20 md:h-24 md:w-32">
         {thumb && (
-          <Image src={thumb.src} alt="" fill unoptimized sizes="128px" className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110" />
+          <Image src={thumb.src} alt="" fill sizes="128px" className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-110" />
         )}
       </span>
       <span className="min-w-0 flex-1">

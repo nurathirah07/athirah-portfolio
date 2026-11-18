@@ -143,10 +143,13 @@ export default function SceneBackground() {
       nextRipple = (nextRipple + 1) % MAX_RIPPLES;
     };
 
+    // Phones get a lighter version: lower resolution, half the frame rate.
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+
     // The background is soft, so it renders at reduced resolution.
     const resize = () => {
       const r = canvas.getBoundingClientRect();
-      const scale = Math.min(window.devicePixelRatio || 1, 1) * 0.6;
+      const scale = Math.min(window.devicePixelRatio || 1, 1) * (phone ? 0.4 : 0.6);
       canvas.width = Math.max(1, Math.round(r.width * scale));
       canvas.height = Math.max(1, Math.round(r.height * scale));
       gl.viewport(0, 0, canvas.width, canvas.height);
@@ -184,11 +187,29 @@ export default function SceneBackground() {
     window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("pointerdown", down, { passive: true });
 
+    // Copy the video to the GPU only when it has a new frame (30 a second),
+    // not on every screen refresh. Browsers without requestVideoFrameCallback
+    // copy every time, as before.
+    let fresh = true;
+    let watching = 0;
+    const watchFrames = "requestVideoFrameCallback" in video;
+    const onVideoFrame = () => {
+      fresh = true;
+      watching = video.requestVideoFrameCallback(onVideoFrame);
+    };
+    if (watchFrames) watching = video.requestVideoFrameCallback(onVideoFrame);
+
     let raf = 0;
     let visible = true;
+    let lastDraw = 0;
     const frame = (now: number) => {
       raf = 0;
       if (!visible || document.hidden) return;
+      if (phone && now - lastDraw < 30) {
+        raf = requestAnimationFrame(frame);
+        return;
+      }
+      lastDraw = now;
       const t = now / 1000;
       // Without a pointer (phones, or an idle mouse) the light drifts on its own.
       if (now - lastPointer > 4000) {
@@ -199,7 +220,8 @@ export default function SceneBackground() {
       mouse.y += (target.y - mouse.y) * 0.06;
 
       if (video.readyState >= 2) {
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+        if (fresh) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, video);
+        if (watchFrames) fresh = false;
         gl.uniform2f(uVid, video.videoWidth, video.videoHeight);
       } else {
         gl.uniform2f(uVid, 16, 9);
@@ -231,6 +253,7 @@ export default function SceneBackground() {
 
     return () => {
       cancelAnimationFrame(raf);
+      if (watchFrames) video.cancelVideoFrameCallback(watching);
       io.disconnect();
       resizer.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);

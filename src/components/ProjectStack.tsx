@@ -143,9 +143,10 @@ function Card({ p, index, progress }: { p: Project; index: number; progress: Mot
 
   return (
     <div className="sticky flex h-[78svh] min-h-140 items-start" style={{ top: `calc(5.5rem + ${index * 14}px)` }}>
+      {/* will-change: the card is scaled on the graphics chip as you scroll, not repainted every frame. */}
       <motion.article
         style={{ scale }}
-        className="group relative grid h-full w-full origin-top grid-rows-[auto_minmax(0,1fr)] gap-6 overflow-hidden rounded-[1.75rem] border border-cream/20 bg-[#08291e] p-6 md:border-cream/10 md:bg-[#04170e] shadow-[0_-20px_60px_-30px_rgb(0_0_0/0.9)] md:p-10 lg:grid-cols-[0.85fr_1.15fr] lg:grid-rows-1 lg:gap-12"
+        className="group relative grid will-change-transform h-full w-full origin-top grid-rows-[auto_minmax(0,1fr)] gap-6 overflow-hidden rounded-[1.75rem] border border-cream/20 bg-[#08291e] p-6 md:border-cream/10 md:bg-[#04170e] shadow-[0_-20px_60px_-30px_rgb(0_0_0/0.9)] md:p-10 lg:grid-cols-[0.85fr_1.15fr] lg:grid-rows-1 lg:gap-12"
       >
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60rem_30rem_at_0%_0%,rgb(19_111_99/0.18),transparent_60%)]" />
 
@@ -181,7 +182,7 @@ function Card({ p, index, progress }: { p: Project; index: number; progress: Mot
           <Collage p={p} />
         </TransitionLink>
 
-        <motion.div aria-hidden style={{ opacity: dim }} className="pointer-events-none absolute inset-0 bg-ink" />
+        <motion.div aria-hidden style={{ opacity: dim }} className="pointer-events-none absolute inset-0 bg-ink will-change-[opacity]" />
       </motion.article>
     </div>
   );
