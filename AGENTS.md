@@ -16,7 +16,6 @@ Anything with more than two states is an explicit state machine, not a set of bo
 |---|---|---|---|
 | Mira's conversation | `src/lib/miraMachine.ts` | welcome, asking, thinking, sending, sent, drafted, failed | `data-phase`, `data-step`, `data-ready` on `section[aria-labelledby=assistant-title]` |
 | Mira's questions | `steps`, `nextStep`, `previousStep`, `withAnswer`, `withoutAnswer` in `src/data/assistant.ts` | greeting … summary | `data-step` (same section) |
-| Mira's orb renderer | `src/components/MiraOrb.tsx` | loading, glass, flat | `data-renderer` on `[data-orb]` |
 | In-browser voice | `live` in `src/lib/miraVoice.ts` | off, unavailable, loading, ready, failed | `voiceStatus()` |
 | Page transition | `src/components/Curtain.tsx` | idle, covering, revealing | `data-phase` on the curtain |
 | Screens strip | `Mode` in `src/components/ShotRail.tsx` | drifting, focused, dragging | `data-mode` on the strip |
