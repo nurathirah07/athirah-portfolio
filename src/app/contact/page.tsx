@@ -39,7 +39,7 @@ export default function Contact() {
                 <dt className="font-accent text-[11px] text-cream/50">{d.label}</dt>
                 <dd className="text-right text-sm font-medium md:text-base">
                   {d.href ? (
-                    <a href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} download={d.href.endsWith(".pdf") ? "Nur Athirah Azmi - Resume.pdf" : undefined} rel="noreferrer" className="hover:text-gold">
+                    <a href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} download={d.href.endsWith(".pdf") ? "Nur Athirah Azmi - Resume.pdf" : undefined} rel="noreferrer" className="-my-3 inline-block py-3 hover:text-gold">
                       <RollText>{d.value}</RollText>
                     </a>
                   ) : (

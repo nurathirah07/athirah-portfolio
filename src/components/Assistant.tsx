@@ -144,6 +144,28 @@ export default function Assistant() {
     // `spoken` is rebuilt every render; lineId identifies the line.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lineId, seen, thinking]);
+  // On a phone a long question can push the answers under the bottom tab bar,
+  // and a short one after it can leave the question under the header. Once
+  // the answers have appeared, scroll the least needed to show both; if they
+  // can't both fit, the start of the question wins.
+  const answers = useRef<HTMLDivElement>(null);
+  const showAnswers = done && !thinking && !!turn;
+  useEffect(() => {
+    if (!showAnswers || !window.matchMedia("(max-width: 767px)").matches) return;
+    const timer = setTimeout(() => {
+      const box = answers.current?.getBoundingClientRect();
+      const question = answers.current?.previousElementSibling?.getBoundingClientRect();
+      if (!box || !question || box.height === 0) return;
+      const header = 72;
+      const tabBar = 96;
+      const least = box.bottom - (window.innerHeight - tabBar); // answers fully shown
+      const most = question.top - header; // question still below the header
+      const by = least > most ? most : Math.max(least, Math.min(0, most));
+      if (Math.abs(by) > 4) window.scrollBy({ top: by, behavior: reduce ? "auto" : "smooth" });
+    }, 420); // after the answers have animated in
+    return () => clearTimeout(timer);
+  }, [showAnswers, lineId, reduce]);
+
   useLayoutEffect(
     () => () => {
       stopSpeaking();
@@ -364,7 +386,7 @@ export default function Assistant() {
 
   const finished = status !== "talking";
   const typing = turn?.input !== "options" || step === "summary"; // a form or the summary is showing
-  const pill = "glass rounded-full border px-5 py-3 text-sm text-cream/85 transition-colors duration-300 hover:border-gold/60 hover:text-gold md:text-base";
+  const pill = "glass rounded-full border px-4 py-2.5 md:px-5 md:py-3 text-sm text-cream/85 transition-colors duration-300 hover:border-gold/60 hover:text-gold md:text-base";
   const field =
     "w-full rounded-2xl border border-cream/12 bg-ink/40 px-4 py-3 text-sm outline-none transition-colors placeholder:text-cream/35 focus:border-gold md:text-base";
   const label = "mb-1.5 block font-accent text-[10px] text-cream/50";
@@ -436,7 +458,7 @@ export default function Assistant() {
 
       {/* What she says. Screen readers get it whole; the typing is visual only. */}
       <p className="sr-only" aria-live="polite">{!seen ? "" : thinking ? "One moment…" : prompt}</p>
-      <p aria-hidden className="mt-4 flex min-h-[2.8em] max-w-3xl items-start justify-center font-display text-2xl leading-snug md:text-4xl">
+      <p aria-hidden className="mt-3 flex min-h-[2.8em] max-w-3xl items-start justify-center font-display text-[1.375rem] leading-snug sm:text-2xl md:mt-4 md:text-4xl">
         {thinking ? (
           <span className="mt-3 flex gap-2">
             {[0, 1, 2].map((i) => (
@@ -452,7 +474,7 @@ export default function Assistant() {
       </p>
 
       {/* How the visitor answers */}
-      <div className="mt-5 w-full max-w-3xl">
+      <div ref={answers} className="mt-4 w-full max-w-3xl md:mt-5">
         <AnimatePresence mode="wait">
           {done && !thinking && turn && (
             <motion.div
@@ -477,7 +499,7 @@ export default function Assistant() {
               )}
 
               {status === "talking" && turn.options.length > 0 && (
-                <div className="flex flex-wrap justify-center gap-2.5">
+                <div className="flex flex-wrap justify-center gap-2 md:gap-2.5">
                   {turn.options.map((option, i) => (
                     <motion.button
                       key={option}
@@ -666,16 +688,16 @@ function Welcome({ onStart }: { onStart: () => void }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
-        className="mb-16 grid w-full grid-cols-[1fr_auto_1fr] items-end gap-4 font-accent text-[10px] md:mb-0 md:text-[11px]"
+        className="mb-14 grid w-full grid-cols-[1fr_auto_1fr] items-end gap-4 font-accent text-[10px] md:mb-0 md:text-[11px]"
       >
-        <a href={links[0]?.href} target="_blank" rel="noreferrer" className={`justify-self-start text-cream/50 hover:text-gold ${links[0] ? "" : "invisible"}`}>
+        <a href={links[0]?.href} target="_blank" rel="noreferrer" className={`justify-self-start py-3 text-cream/50 hover:text-gold ${links[0] ? "" : "invisible"}`}>
           {links[0]?.label}
         </a>
         <p className="text-center">
           <span className="block normal-case tracking-normal text-cream/40">(Not a fan of chats?)</span>
-          <a href={`mailto:${site.email}`} className="mt-1 inline-block text-cream/80 hover:text-gold">{site.email}</a>
+          <a href={`mailto:${site.email}`} className="inline-block py-3 text-cream/80 hover:text-gold">{site.email}</a>
         </p>
-        <a href={links[1]?.href} target="_blank" rel="noreferrer" className={`justify-self-end text-cream/50 hover:text-gold ${links[1] ? "" : "invisible"}`}>
+        <a href={links[1]?.href} target="_blank" rel="noreferrer" className={`justify-self-end py-3 text-cream/50 hover:text-gold ${links[1] ? "" : "invisible"}`}>
           {links[1]?.label}
         </a>
       </motion.div>

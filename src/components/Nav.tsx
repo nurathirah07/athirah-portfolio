@@ -83,7 +83,7 @@ export default function Nav() {
               key={l.href}
               href={l.href}
               aria-current={active ? "page" : undefined}
-              className={`relative rounded-full py-3 text-center font-accent text-[10px] transition-colors duration-300 ${active ? "text-ink" : "text-cream/70"}`}
+              className={`relative rounded-full py-3 text-center font-accent text-[11px] transition-colors duration-300 ${active ? "text-ink" : "text-cream/70"}`}
             >
               {active && <motion.span layoutId="tab-pill" className="absolute inset-0 rounded-full bg-gold" transition={SPRING} />}
               <span className="relative">{l.label}</span>

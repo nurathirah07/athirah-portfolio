@@ -106,14 +106,14 @@ export default function MiraOrb({
     squashY.set(1 - s * 0.9);
   });
 
-  const size = compact ? "h-24 w-24 md:h-28 md:w-28" : "h-36 w-36 md:h-44 md:w-44";
+  const size = compact ? "h-20 w-20 md:h-28 md:w-28" : "h-28 w-28 md:h-44 md:w-44";
 
   return (
     <motion.div
       data-orb
       style={{ x: leanX }}
       // Shrinks when a form or summary needs the room. Extra room below is the surface.
-      className={`relative transition-[width,height,margin] duration-700 ease-out ${size} ${compact ? "mb-12 mt-4" : "mb-16 mt-6 md:mb-20"}`}
+      className={`relative transition-[width,height,margin] duration-700 ease-out ${size} ${compact ? "mb-9 mt-2 md:mb-12 md:mt-4" : "mb-11 mt-3 md:mb-20 md:mt-6"}`}
     >
       {/* ---- The surface below her ---- */}
       <div aria-hidden className="pointer-events-none absolute left-1/2 top-[112%] h-0 w-0">
