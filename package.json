@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "eslint",
     "voice": "node --no-warnings scripts/mira-voice.mjs",
+    "load": "k6 run scripts/load/visitors.js",
     "test": "node --no-warnings --import ./scripts/test-setup.mjs --test \"src/**/*.test.ts\""
   },
   "dependencies": {
