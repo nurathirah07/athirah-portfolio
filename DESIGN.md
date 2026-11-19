@@ -77,8 +77,9 @@ cards that stack or move while scrolling, like the Work stack), `.glass-dark` (n
 | Expertise list | `components/ExpertiseList.tsx` | A dark fill rises up the row from its bottom edge on hover (and `focus-within`); a project screenshot floats beside the cursor. Rows aren't links, so no arrow |
 | Parallax gallery | `components/ParallaxGallery.tsx`, `lib/gallery.ts` | Home, between Featured projects and What I build: photos in 4 columns (2 on phones) that slide at different speeds while scrolling past. **The photos are whatever is in `public/images/gallery/`** (filename order; tall 2:3 photos look best), not project screenshots. Decorative, so no links. Hidden while the folder is empty. Half speed on phones, still with reduced motion |
 | Marquee | `components/Marquee.tsx` | Tilted amethyst band, 32s loop, pauses on hover |
-| Shots strip | `components/ShotRail.tsx` | Machine `drifting / focused / dragging` (`data-mode`) |
-| Footer | `components/Footer.tsx` | Glass CTA card: `RiseText` heading, Magnetic "Send a message", copy-email button, roll links, "Back to top" via `scrollToY`. (The giant footer name was removed at Athirah's request; don't bring it back) |
+| Shots strip | `components/ShotRail.tsx`, `lib/railMachine.ts` | Machine `drifting / focused / dragging` (`data-mode`); send it events, never set the mode |
+| Copy button | `lib/useCopy.ts`, `lib/copyMachine.ts` | **Every copy-to-clipboard button uses this.** `const [state, copy] = useCopy()`; show `state.name` (idle / copying / copied / failed) on the button and as `data-copy`. "Copied" lasts 2s, "failed" 4s; a second click restarts the wait. `copy()` resolves to `"failed"` when the browser blocks it, so offer a fallback (the footer opens the email app) |
+| Footer | `components/Footer.tsx` | Glass CTA card: `RiseText` heading, Magnetic "Send a message", copy-email button (`useCopy`), roll links, "Back to top" via `scrollToY`. (The giant footer name was removed at Athirah's request; don't bring it back) |
 | Curtain name | `components/Curtain.tsx` | The name shows in the middle while the screen is fully covered (driven by the disc's size, no extra state) |
 | Dotted | `components/Dotted.tsx` | Draws a line of text (extra-bold) or a photo (halftone: denser where lighter) as thousands of fine stippled dots that part around the pointer and spring back. Fills its positioned parent, which may move (marquee, parallax). Used for the home hero's sliding name and the two echoes beside the portrait. Redraws only while dots are moving |
 | Reels | `components/VideoBackdrop.tsx` | The one video component (6.3). Machine `idle → loading → paused ⇄ playing`, plus `failed`; `data-state="still"` when it shows the poster only. Used by the `/work` cards, the project page's full-screen opening (`ProjectIntro`), the home cards (`mode="hover"`, filling the picture area) and the previous/next links. Never inside a `Browser` frame |
@@ -88,7 +89,9 @@ cards that stack or move while scrolling, like the Work stack), `.glass-dark` (n
 - Springs: cursor `500/40`, nav pill `400/32`, magnetic `220/16`, floating preview `260/26`.
 - Hover effects are for the mouse only (`e.pointerType === "mouse"`, `(hover: hover) and (pointer: fine)`).
   On phones, use `usePhone()` for gentler versions.
-- Check `useReducedMotion()` / `prefers-reduced-motion` in every new effect (see section 10).
+- Check `useReducedMotion()` / `prefers-reduced-motion` in every new effect (see section 10). Where it changes the markup itself
+  (a still image instead of a video, controls that only exist with motion on), use `usePrefersStill()` instead, so the first
+  paint matches the server's HTML (see AGENTS.md).
 - Comments explain *what the visitor sees*, in plain sentences (as in the existing files).
 
 ---

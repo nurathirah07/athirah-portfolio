@@ -6,6 +6,7 @@ import { CONFIRM, emptyBrief, fieldFor, lines, previousStep, steps, withAnswer, 
 import { site } from "@/data/site";
 import { scriptedTurn, type Said, type Turn } from "@/lib/miraBrain";
 import { conversation, type Phase, type PhaseEvent } from "@/lib/miraMachine";
+import { useCopy } from "@/lib/useCopy";
 import { useMachine } from "@/lib/useMachine";
 import { isSpeaking, wakeAudio, loudness, preload, speak, speechSeconds, stopSpeaking } from "@/lib/miraVoice";
 
@@ -44,7 +45,7 @@ export default function Assistant() {
   const [aside, setAside] = useState<string | null>(null); // a short remark shown above the orb
   const [details, setDetails] = useState("");
   const [person, setPerson] = useState({ name: "", contact: "" });
-  const [copied, setCopied] = useState(false);
+  const [copyState, copy] = useCopy(); // "Copy the details" on the drafted screen (see lib/copyMachine.ts)
 
   // Things to remember that don't change what is on screen.
   const memo = useRef({
@@ -304,18 +305,13 @@ export default function Assistant() {
       mira.send({ type: "FAILED" });
     }
   };
-  const copyBrief = () => {
-    void navigator.clipboard
-      ?.writeText([subject, "", ...filled.map(([label, value]) => `${label}: ${value}`)].join("\n"))
-      .then(() => setCopied(true));
-  };
+  const copyBrief = () => void copy([subject, "", ...filled.map(([label, value]) => `${label}: ${value}`)].join("\n"));
   const restart = () => {
     const greeting = scriptedTurn("greeting", emptyBrief, { kind: "start" }, context());
     if (!mira.send({ type: "RESTART", turn: greeting })) return;
     Object.assign(memo.current, { history: [], idles: 0, backs: 0, warnedLeaving: false });
     setDetails("");
     setPerson({ name: "", contact: "" });
-    setCopied(false);
     said(greeting);
   };
 
@@ -512,8 +508,10 @@ export default function Assistant() {
               {status === "drafted" && (
                 <p className="mb-4 max-w-md text-sm text-cream/60">
                   Email app didn&apos;t open?{" "}
-                  <button type="button" onClick={copyBrief} className="text-gold underline-offset-4 hover:underline">
-                    {copied ? "Copied!" : "Copy the details"}
+                  <button type="button" onClick={copyBrief} data-copy={copyState.name} className="text-gold underline-offset-4 hover:underline">
+                    <span aria-live="polite">
+                      {copyState.name === "copied" ? "Copied!" : copyState.name === "failed" ? "Couldn't copy. Try again" : "Copy the details"}
+                    </span>
                   </button>{" "}
                   and send them to <a href={`mailto:${site.email}`} className="text-cream hover:text-gold">{site.email}</a>.
                 </p>

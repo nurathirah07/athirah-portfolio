@@ -1,8 +1,10 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- previews of local, just-picked files */
-import { startTransition, useActionState, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { deviceOf, isPortrait, suggestPlatform, type Device, type Platform, type Project, type Shot } from "@/data/site";
+import { activity, type Activity, type ActivityEvent, type Task } from "@/lib/admin/activityMachine";
+import { useMachine } from "@/lib/useMachine";
 import { deleteProject, moveProject, saveProject, signOut, type FormState } from "./actions";
 
 const NEW = "__new__";
@@ -24,25 +26,48 @@ function Field({ label, hint, error, children }: { label: string; hint?: string;
   );
 }
 
+const WORKING: Record<Exclude<Task, "saving">, string> = { moving: "Saving the new order…", deleting: "Deleting…" };
+
 export default function AdminEditor({ projects }: { projects: Project[] }) {
   const router = useRouter();
   const [selected, setSelected] = useState(projects[0]?.slug ?? NEW);
-  const [notice, setNotice] = useState<string | null>(null);
-  const [busy, startTransition] = useTransition();
+  // Saving, reordering and deleting: one at a time (see lib/admin/activityMachine.ts).
+  const [now, admin] = useMachine<Activity, ActivityEvent>({ name: "idle", notice: null }, activity);
+  const task = now.name === "busy" ? now.task : null;
+  const busy = task !== null;
+  const notice = now.name === "idle" ? now.notice : null;
+  const [, startTransition] = useTransition();
 
   const project = projects.find((p) => p.slug === selected);
   const editing = selected === NEW ? blank : project;
 
-  const run = (task: () => Promise<FormState>, after?: (r: FormState) => void) =>
+  // Choosing another project hides the last notice, which was about this one.
+  const choose = (slug: string) => {
+    admin.send({ type: "CLEAR" });
+    setSelected(slug);
+  };
+
+  // Runs one change to the project list, unless another is still running.
+  // A save's problems show beside its fields (errorsInline) rather than at the top.
+  const run = (next: Task, work: () => Promise<FormState>, after?: (r: FormState) => void, { errorsInline = false } = {}) => {
+    if (!admin.send({ type: "START", task: next })) return;
     startTransition(async () => {
-      const result = await task();
-      setNotice(result.error ?? result.message ?? null);
+      let result: FormState;
+      try {
+        result = await work();
+      } catch {
+        // Usually an expired session: the action refuses to run.
+        result = { error: "That didn't go through. You may have been signed out: reload the page and try again." };
+      }
+      const text = result.error && errorsInline ? undefined : (result.error ?? result.message);
+      admin.send({ type: "FINISH", notice: text ? { tone: result.error ? "error" : "done", text } : null });
       after?.(result);
       router.refresh();
     });
+  };
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[18rem_1fr]">
+    <div className="grid gap-8 lg:grid-cols-[18rem_1fr]" data-phase={now.name} data-task={task ?? undefined}>
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-3xl">Projects</h1>
@@ -54,8 +79,9 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
 
         <button
           type="button"
-          onClick={() => setSelected(NEW)}
-          className={`mt-6 w-full rounded-2xl border border-dashed px-4 py-3 text-left font-accent text-xs transition-colors ${selected === NEW ? "border-gold text-gold" : "border-cream/25 text-cream/70 hover:border-gold hover:text-gold"}`}
+          onClick={() => choose(NEW)}
+          disabled={busy}
+          className={`mt-6 w-full rounded-2xl border border-dashed px-4 py-3 text-left font-accent text-xs transition-colors disabled:opacity-50 ${selected === NEW ? "border-gold text-gold" : "border-cream/25 text-cream/70 hover:border-gold hover:text-gold"}`}
         >
           + New project
         </button>
@@ -63,7 +89,7 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
         <ol className="mt-3 space-y-2">
           {projects.map((p, i) => (
             <li key={p.slug} className={`group flex items-center gap-2 rounded-2xl border px-3 py-2 transition-colors ${p.slug === selected ? "border-gold/60 bg-gold/10" : "border-cream/10 hover:border-cream/30"}`}>
-              <button type="button" onClick={() => setSelected(p.slug)} className="flex min-w-0 flex-1 items-center gap-3 text-left">
+              <button type="button" onClick={() => choose(p.slug)} disabled={busy} className="flex min-w-0 flex-1 items-center gap-3 text-left">
                 {p.shots[0] ? (
                   <img src={p.shots[0].src} alt="" className="h-9 w-12 shrink-0 rounded-md object-cover object-top" />
                 ) : (
@@ -75,8 +101,8 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
                 </span>
               </button>
               <span className="flex flex-col">
-                <button type="button" aria-label={`Move ${p.title} up`} disabled={i === 0 || busy} onClick={() => run(() => moveProject(p.slug, -1))} className="px-1 text-xs text-cream/50 hover:text-gold disabled:opacity-20">▲</button>
-                <button type="button" aria-label={`Move ${p.title} down`} disabled={i === projects.length - 1 || busy} onClick={() => run(() => moveProject(p.slug, 1))} className="px-1 text-xs text-cream/50 hover:text-gold disabled:opacity-20">▼</button>
+                <button type="button" aria-label={`Move ${p.title} up`} disabled={i === 0 || busy} onClick={() => run("moving", () => moveProject(p.slug, -1))} className="px-1 text-xs text-cream/50 hover:text-gold disabled:opacity-20">▲</button>
+                <button type="button" aria-label={`Move ${p.title} down`} disabled={i === projects.length - 1 || busy} onClick={() => run("moving", () => moveProject(p.slug, 1))} className="px-1 text-xs text-cream/50 hover:text-gold disabled:opacity-20">▼</button>
               </span>
             </li>
           ))}
@@ -84,9 +110,17 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
       </aside>
 
       <section className="glass rounded-3xl p-6 md:p-8">
+        {task && task !== "saving" && (
+          <p role="status" className="mb-6 rounded-xl border border-cream/15 px-4 py-3 text-sm text-cream/70">
+            {WORKING[task]}
+          </p>
+        )}
         {notice && (
-          <p role="status" className="mb-6 rounded-xl border border-gold/30 bg-gold/10 px-4 py-3 text-sm text-gold">
-            {notice}
+          <p
+            role={notice.tone === "error" ? "alert" : "status"}
+            className={`mb-6 rounded-xl border px-4 py-3 text-sm ${notice.tone === "error" ? "border-flame/40 bg-flame/10 text-flame" : "border-gold/30 bg-gold/10 text-gold"}`}
+          >
+            {notice.text}
           </p>
         )}
         {editing ? (
@@ -94,14 +128,23 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
             key={selected}
             project={editing}
             isNew={selected === NEW}
-            onSaved={(r) => {
-              setNotice(r.message ?? null);
-              if (r.slug) setSelected(r.slug);
-              router.refresh();
-            }}
+            task={task}
+            onSave={(form, done) =>
+              run(
+                "saving",
+                () => saveProject({}, form),
+                (r) => {
+                  done(r);
+                  if (r.ok && r.slug) setSelected(r.slug);
+                },
+                { errorsInline: true },
+              )
+            }
             onDelete={() => {
-              if (!project || !window.confirm(`Delete "${project.title}"? This can't be undone.`)) return;
-              run(() => deleteProject(project.slug), () => setSelected(projects.find((p) => p.slug !== project.slug)?.slug ?? NEW));
+              if (!project || busy || !window.confirm(`Delete "${project.title}"? This can't be undone.`)) return;
+              run("deleting", () => deleteProject(project.slug), (r) => {
+                if (r.ok) setSelected(projects.find((p) => p.slug !== project.slug)?.slug ?? NEW);
+              });
             }}
           />
         ) : (
@@ -115,15 +158,19 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
 function ProjectForm({
   project,
   isNew,
-  onSaved,
+  task,
+  onSave,
   onDelete,
 }: {
   project: Project;
   isNew: boolean;
-  onSaved: (r: FormState) => void;
+  /** What the editor is busy with, if anything: every button waits for it. */
+  task: Task | null;
+  /** Saves the form; `done` receives the result (field errors, or success). */
+  onSave: (form: FormData, done: (r: FormState) => void) => void;
   onDelete: () => void;
 }) {
-  const [state, action, pending] = useActionState<FormState, FormData>(saveProject, {});
+  const [state, setState] = useState<FormState>({}); // the last save's result
   const [title, setTitle] = useState(project.title);
   const [slug, setSlug] = useState(project.slug);
   const [slugTouched, setSlugTouched] = useState(!isNew);
@@ -138,18 +185,9 @@ function ProjectForm({
   // is chosen, the image's shape decides.
   const [newDevices, setNewDevices] = useState<Record<string, Device>>({});
   const fileInput = useRef<HTMLInputElement>(null);
-  const handled = useRef<FormState | null>(null);
 
   const previews = useMemo(() => files.map((f) => URL.createObjectURL(f)), [files]);
   useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
-
-  // Hand a successful save to the parent once.
-  useEffect(() => {
-    if (state.ok && handled.current !== state) {
-      handled.current = state;
-      onSaved(state);
-    }
-  }, [state, onSaved]);
 
   const err = state.fields ?? {};
 
@@ -199,7 +237,7 @@ function ProjectForm({
         files.forEach((f) => fd.append("files", f));
         fd.set("shots", JSON.stringify(shots.map((shot) => ({ src: shot.src, alt: shot.alt, device: savedDevice(shot) }))));
         fd.set("fileDevices", JSON.stringify(previews.map(newDevice)));
-        startTransition(() => action(fd));
+        onSave(fd, setState);
       }}
       className="space-y-6"
     >
@@ -208,8 +246,8 @@ function ProjectForm({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="font-display text-2xl md:text-3xl">{isNew ? "New project" : project.title}</h2>
         {!isNew && (
-          <button type="button" onClick={onDelete} className="rounded-full border border-flame/40 px-4 py-2 font-accent text-[11px] text-flame transition-colors hover:bg-flame hover:text-ink">
-            Delete
+          <button type="button" onClick={onDelete} disabled={task !== null} className="rounded-full border border-flame/40 px-4 py-2 font-accent text-[11px] text-flame transition-colors hover:bg-flame hover:text-ink disabled:opacity-50">
+            {task === "deleting" ? "Deleting…" : "Delete"}
           </button>
         )}
       </div>
@@ -471,8 +509,8 @@ function ProjectForm({
       {state.error && !state.ok && <p role="alert" className="text-sm text-flame">{state.error}</p>}
 
       <div className="flex flex-wrap items-center gap-4 border-t border-cream/10 pt-6">
-        <button type="submit" disabled={pending} className="roll-plain btn-gloss rounded-full px-7 py-3 font-accent text-sm disabled:opacity-60">
-          {pending ? "Saving…" : isNew ? "Add project" : "Save changes"}
+        <button type="submit" disabled={task !== null} className="roll-plain btn-gloss rounded-full px-7 py-3 font-accent text-sm disabled:opacity-60">
+          {task === "saving" ? "Saving…" : isNew ? "Add project" : "Save changes"}
         </button>
         <span className="text-xs text-cream/45">Saves to src/data/projects.json. Rebuild the site to publish.</span>
       </div>

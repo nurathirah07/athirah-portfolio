@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Magnetic from "@/components/Magnetic";
 import Reveal from "@/components/Reveal";
@@ -8,6 +7,7 @@ import RollText from "@/components/RollText";
 import TransitionLink from "@/components/TransitionLink";
 import { site } from "@/data/site";
 import { scrollToY } from "@/lib/scroll";
+import { useCopy } from "@/lib/useCopy";
 
 const pages = [
   { href: "/", label: "Home" },
@@ -20,7 +20,8 @@ const pages = [
 // one-click way to copy the email address, and the site's links.
 export default function Footer() {
   const path = usePathname();
-  const [copied, setCopied] = useState(false);
+  const [copyState, copy] = useCopy(); // idle, copying, copied or failed (see lib/copyMachine.ts)
+  const copied = copyState.name === "copied";
 
   // The contact page is the call to action; the admin doesn't need one.
   const showCard = path !== "/contact" && !path.startsWith("/admin");
@@ -30,14 +31,8 @@ export default function Footer() {
   ].filter((s) => s.href);
 
   const copyEmail = async () => {
-    try {
-      await navigator.clipboard.writeText(site.email);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard blocked: fall back to opening the email app.
-      window.location.href = `mailto:${site.email}`;
-    }
+    // Clipboard blocked: fall back to opening the email app.
+    if ((await copy(site.email)) === "failed") window.location.href = `mailto:${site.email}`;
   };
 
   return (
@@ -60,6 +55,7 @@ export default function Footer() {
                 <button
                   type="button"
                   onClick={copyEmail}
+                  data-copy={copyState.name}
                   data-cursor-label={copied ? "Copied" : "Copy"}
                   className="rounded-full border border-cream/20 px-6 py-4 text-sm transition-colors duration-300 hover:border-gold hover:text-gold"
                 >

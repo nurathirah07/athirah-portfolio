@@ -1,5 +1,22 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { createMachine, type Transitions } from "@/lib/machine";
+
+// The background's phases (shown on its wrapper as data-state):
+//
+//   paused ──RUN──▶ running ──PAUSE──▶ paused        (any) ──STILL──▶ still
+//
+// - running: the video plays and the shader draws every frame.
+// - paused:  the hero is off screen or the tab is hidden: nothing plays or draws.
+// - still:   reduced motion, or no WebGL: a dimmed still image instead, for good.
+type Scene = { name: "paused" } | { name: "running" } | { name: "still" };
+type SceneEvent = { type: "RUN" } | { type: "PAUSE" } | { type: "STILL" };
+const still = (): Scene => ({ name: "still" });
+const scenes: Transitions<Scene, SceneEvent> = {
+  paused: { RUN: () => ({ name: "running" }), STILL: still },
+  running: { PAUSE: () => ({ name: "paused" }), STILL: still },
+  still: {},
+};
 
 const VIDEO = "/animations/scene-bg.mp4";
 const POSTER = "/animations/scene-bg.jpg";
@@ -83,26 +100,35 @@ function compile(gl: WebGLRenderingContext, type: number, src: string) {
 // Animated gradient behind the home hero. It sits under the portrait, so the
 // photo itself is never distorted or tinted.
 export default function SceneBackground() {
+  const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const posterRef = useRef<HTMLImageElement>(null);
 
   useEffect(() => {
+    const root = rootRef.current!;
     const canvas = canvasRef.current!;
     const video = videoRef.current!;
+    // The phase changes many times a second at most, never needs a re-render:
+    // it only goes on the wrapper, for tests and debugging.
+    const scene = createMachine<Scene, SceneEvent>({ name: "paused" }, scenes);
+    const showPhase = () => (root.dataset.state = scene.get().name);
+    const stopShowing = scene.subscribe(showPhase);
+    showPhase();
     // Static, dimmed still image when motion is off or WebGL is missing.
     const setFallback = () => {
+      scene.send({ type: "STILL" });
       canvas.hidden = true;
       posterRef.current!.hidden = false;
     };
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       setFallback();
-      return;
+      return stopShowing;
     }
     const gl = canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" });
     if (!gl) {
       setFallback();
-      return;
+      return stopShowing;
     }
 
     let program: WebGLProgram;
@@ -114,7 +140,7 @@ export default function SceneBackground() {
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error("link");
     } catch {
       setFallback();
-      return;
+      return stopShowing;
     }
     gl.useProgram(program);
 
@@ -208,7 +234,7 @@ export default function SceneBackground() {
     let lastDraw = 0;
     const frame = (now: number) => {
       raf = 0;
-      if (!visible || document.hidden) return;
+      if (!visible || document.hidden) return pause();
       if (phone && now - lastDraw < 30) {
         raf = requestAnimationFrame(frame);
         return;
@@ -237,33 +263,41 @@ export default function SceneBackground() {
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       raf = requestAnimationFrame(frame);
     };
+    // Only a paused scene starts, so the drawing loop can never run twice.
     const start = () => {
-      if (!raf && visible && !document.hidden) {
+      if (visible && !document.hidden && scene.send({ type: "RUN" })) {
         video.play().catch(() => {});
         raf = requestAnimationFrame(frame);
       }
+    };
+    const pause = () => {
+      if (!scene.send({ type: "PAUSE" })) return;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      video.pause();
     };
 
     // Pause the video and the drawing whenever the hero is off screen.
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
       if (visible) start();
-      else video.pause();
+      else pause();
     });
     io.observe(canvas);
-    const onVisibility = () => (document.hidden ? video.pause() : start());
+    const onVisibility = () => (document.hidden ? pause() : start());
     document.addEventListener("visibilitychange", onVisibility);
     start();
 
     return () => {
-      cancelAnimationFrame(raf);
+      pause();
+      video.pause();
+      stopShowing();
       if (watchFrames) video.cancelVideoFrameCallback(watching);
       io.disconnect();
       resizer.disconnect();
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerdown", down);
-      video.pause();
       gl.deleteTexture(texture);
       gl.deleteBuffer(buffer);
       gl.deleteProgram(program);
@@ -271,7 +305,7 @@ export default function SceneBackground() {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0">
+    <div ref={rootRef} aria-hidden className="pointer-events-none absolute inset-0">
       <canvas ref={canvasRef} className="h-full w-full" />
       {/* Source for the shader; it is never shown directly */}
       <video

@@ -1,10 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import WorkBackdrop from "@/components/WorkBackdrop";
 import { projects, workTiles } from "@/data/site";
 import { usePhone } from "@/lib/usePhone";
+import { usePrefersStill } from "@/lib/usePrefersStill";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const BEAT_MS = 1700;
@@ -62,7 +63,7 @@ const BEATS: { a: Word; b: Word; tiles: Tile[] }[] = [
 // jump between positions on a beat while project screenshots pop in and out.
 export default function WorkIntro() {
   const ref = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersStill(); // changes which tiles and echoes are drawn
   const [beat, setBeat] = useState(0);
   // On a phone the words are much bigger, so they only sway near the middle
   // instead of crossing the whole screen (and running off its edges).

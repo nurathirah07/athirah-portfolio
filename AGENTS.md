@@ -19,9 +19,15 @@ Anything with more than two states is an explicit state machine, not a set of bo
 | Page transition | `src/components/Curtain.tsx` | idle, covering, revealing | `data-phase` on the curtain |
 | Phone and tablet menu | `src/components/Menu.tsx` | closed, opening, open, closing | `data-phase` on `#site-menu` |
 | Project reel | `src/components/VideoBackdrop.tsx` | idle, loading, paused, playing, failed (or `still`: poster only) | `data-state` on the reel |
-| Screens strip | `Mode` in `src/components/ShotRail.tsx` | drifting, focused, dragging | `data-mode` on the strip |
+| Screens strip | `src/lib/railMachine.ts` | drifting, focused, dragging | `data-mode` on the strip; `data-focused` on the screen in focus |
+| Copy buttons | `src/lib/copyMachine.ts`, used through `useCopy` (footer email, Mira's "Copy the details") | idle, copying, copied, failed | `data-copy` on the button |
+| Admin editor | `src/lib/admin/activityMachine.ts` | idle (with a notice or none), busy: saving, moving or deleting | `data-phase`, `data-task` on the editor |
+| Home hero background | `Scene` in `src/components/SceneBackground.tsx` | paused, running, still | `data-state` on its wrapper |
 
 In browser tests, wait on these attributes (for Mira: `data-phase="asking"` and `data-ready="true"`) instead of sleeping or reading CSS classes.
+`npm test` covers the pure machines (`src/lib/mira.test.ts`, `src/lib/machines.test.ts`); add a test when you change a table.
+
+When the reduced-motion setting changes **what is on the page** (a still image instead of a video, buttons that only exist with motion on), read it with `usePrefersStill` (`src/lib/usePrefersStill.ts`), not Motion's `useReducedMotion`. The server can't know the setting, so Motion's hook makes the first paint differ from the server's HTML and React redraws that part (React error #418). Motion's hook is still right for animation values and effects.
 
 ## Checks
 

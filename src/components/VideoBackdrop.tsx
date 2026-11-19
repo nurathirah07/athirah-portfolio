@@ -1,11 +1,11 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { useReducedMotion } from "motion/react";
 import type { Reel, Shot } from "@/data/site";
 import type { Transitions } from "@/lib/machine";
 import { useMachine } from "@/lib/useMachine";
 import { usePhone } from "@/lib/usePhone";
+import { usePrefersStill } from "@/lib/usePrefersStill";
 
 // A video's phases (shown on the element as data-state):
 //
@@ -80,7 +80,7 @@ export default function VideoBackdrop({
 }) {
   const box = useRef<HTMLDivElement>(null);
   const el = useRef<HTMLVideoElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersStill(); // decides video or still image, so it must match the server at first
   const phone = usePhone();
   const saving = useSyncExternalStore(noWatch, saveData, () => false);
   const stillOnly = !video || !!reduce || saving;

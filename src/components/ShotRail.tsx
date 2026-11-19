@@ -1,10 +1,13 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { animate, motion, useAnimationFrame, useMotionValue, useReducedMotion } from "motion/react";
+import { animate, motion, useAnimationFrame, useMotionValue } from "motion/react";
 import { Browser, Phone } from "@/components/DeviceFrames";
 import RiseText from "@/components/RiseText";
 import ShotViewer from "@/components/ShotViewer";
 import { deviceOf, type Platform, type Shot } from "@/data/site";
+import { railModes, type RailEvent, type RailMode } from "@/lib/railMachine";
+import { useMachine } from "@/lib/useMachine";
+import { usePrefersStill } from "@/lib/usePrefersStill";
 
 const SPEED = 55; // px per second while drifting
 const FRICTION = 3.2; // how quickly a flick dies away (higher = sooner)
@@ -12,13 +15,6 @@ const NUDGE = 1500; // px per second given by an arrow button
 // Sideways movement before a press counts as a drag, not a tap. Fingers wobble
 // (and the strip drifts under them), so touch gets more room than a mouse.
 const DRAG_START = { mouse: 6, touch: 14 };
-
-// What the visitor is doing with the strip (shown on the element as data-mode):
-// nothing, so it drifts; looking at one screen; or dragging it. One value, so
-// "focused and dragged at once" can't happen.
-type Mode = { kind: "drifting" } | { kind: "focused"; index: number } | { kind: "dragging" };
-const DRIFTING: Mode = { kind: "drifting" };
-const DRAGGING: Mode = { kind: "dragging" };
 
 // A project's screens as a strip that drifts sideways on its own.
 // - Pointing at a screen (or tapping it) slows the strip to a stop, brings that
@@ -29,20 +25,25 @@ const DRAGGING: Mode = { kind: "dragging" };
 //   trackpad, or use the arrow buttons. It glides on from a flick, then
 //   settles back into its own drift.
 // With reduced motion it is a plain row you can scroll.
+//
+// Whether it is drifting, focused on a screen or being dragged is one state
+// machine (src/lib/railMachine.ts), shown as data-mode on the strip. This
+// component sends it events and never sets the mode directly; the machine
+// ignores what doesn't fit (pointing at a screen mid-drag, for example).
 export default function ShotRail({ shots, platform }: { shots: Shot[]; platform: Platform }) {
   const stage = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLUListElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = usePrefersStill(); // decides whether the arrow buttons exist
   const x = useMotionValue(0);
   const pace = useMotionValue(1); // 1 = drifting, 0 = stopped; eased so it never jerks
   const loop = useRef(0); // width of one full set of screens, in px
   const glide = useRef(0); // extra speed from a flick or arrow, px per second (+ moves right)
   const drag = useRef({ active: false, moved: 0, lastX: 0, lastT: 0, speed: 0 });
   const easing = useRef<ReturnType<typeof animate> | null>(null); // the speed change in progress, if any
-  const [mode, setMode] = useState<Mode>(DRIFTING);
+  const [mode, rail] = useMachine<RailMode, RailEvent>({ name: "drifting" }, railModes);
   const [viewing, setViewing] = useState<Shot | null>(null); // the screen open full size, if any
-  const focus = mode.kind === "focused" ? mode.index : null;
-  const grabbing = mode.kind === "dragging";
+  const focus = mode.name === "focused" ? mode.index : null;
+  const grabbing = mode.name === "dragging";
 
   // Enough repeats that the strip always overflows the screen, as two equal
   // halves so it can jump by one half without the jump being visible.
@@ -73,10 +74,10 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       easing.current?.stop();
       glide.current = 0;
       pace.set(1);
-      setMode(DRIFTING);
+      rail.send({ type: "RESET" });
       setViewing(null);
     },
-    [pace],
+    [pace, rail],
   );
 
   useAnimationFrame((_, delta) => {
@@ -92,9 +93,9 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
     easing.current?.stop();
     easing.current = animate(pace, to, { duration: 0.6, ease: "easeOut" });
   };
+  // Focus a screen (slowing the strip to a stop), or let go of it (drifting again).
   const hold = (i: number | null) => {
-    setMode(i === null ? DRIFTING : { kind: "focused", index: i });
-    setPace(i === null ? 1 : 0);
+    if (rail.send(i === null ? { type: "LET_GO" } : { type: "POINT", index: i })) setPace(i === null ? 1 : 0);
   };
 
   // Touch: tapping the screen already in focus opens it full size. Otherwise
@@ -121,7 +122,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
     pace.set(0);
     glide.current = 0;
     x.set(from);
-    setMode({ kind: "focused", index });
+    rail.send({ type: "TAP", index });
     animate(x, Math.min(to, 0), { duration: 0.6, ease: "easeOut" });
   };
 
@@ -151,7 +152,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       if (!d.active && d.moved > DRAG_START[touch ? "touch" : "mouse"]) {
         d.active = true;
         glide.current = 0;
-        setMode(DRAGGING);
+        rail.send({ type: "GRAB" });
       }
       if (d.active) {
         // Smooth the speed over the last few moves so the flick feels natural.
@@ -173,7 +174,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
         return;
       }
       d.active = false;
-      setMode((m) => (m.kind === "dragging" ? DRIFTING : m));
+      rail.send({ type: "DROP" });
       // A pause before letting go means "place it here", not a flick.
       const paused = ev.timeStamp - d.lastT > 80;
       glide.current = paused ? 0 : Math.max(-4000, Math.min(4000, d.speed));
@@ -195,7 +196,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
       if (!sideways || (!e.shiftKey && Math.abs(e.deltaX) <= Math.abs(e.deltaY))) return;
       e.preventDefault();
       e.stopPropagation();
-      setMode((m) => (m.kind === "focused" ? DRIFTING : m));
+      rail.send({ type: "LET_GO" }); // a sideways scroll lets go of a focused screen
       easing.current?.stop();
       pace.set(0);
       setPace(1);
@@ -203,7 +204,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-    // x, pace and the refs are stable for the life of the component.
+    // x, pace, rail and the refs are stable for the life of the component.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce]);
 
@@ -235,10 +236,10 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
         ref={stage}
         className={`relative mt-6 touch-pan-y select-none py-14 ${reduce ? "overflow-x-auto" : "overflow-x-clip"}`}
         data-lenis-prevent={reduce ? "" : undefined}
-        data-mode={mode.kind}
+        data-mode={mode.name}
         onPointerDown={press}
         // Mouse only: lifting a finger also "leaves", which would undo a tap.
-        onPointerLeave={(e) => e.pointerType === "mouse" && !drag.current.active && hold(null)}
+        onPointerLeave={(e) => e.pointerType === "mouse" && hold(null)}
       >
         {/* The room darkens while a screen is in focus. */}
         <div aria-hidden className={`pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgb(0_15_8/0.65)_16%,rgb(0_15_8/0.65)_84%,transparent)] transition-opacity duration-500 ${focus === null ? "opacity-0" : "opacity-100"}`} />
@@ -252,8 +253,9 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
                 key={i}
                 // Copies after the first set are only there to fill the loop.
                 aria-hidden={i >= shots.length || undefined}
-                onPointerEnter={(e) => e.pointerType === "mouse" && !drag.current.active && hold(i)}
+                onPointerEnter={(e) => e.pointerType === "mouse" && hold(i)}
                 data-index={i}
+                data-focused={on || undefined}
                 onClick={reduce ? () => setViewing(s) : undefined}
                 className={`relative shrink-0 px-4 transition-[scale,opacity,filter] duration-500 ease-out md:px-7 ${
                   grabbing ? "scale-[0.97]" : focus === null ? "" : on ? "z-10 scale-110" : "scale-95 opacity-35 blur-[3px]"
