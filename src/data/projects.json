@@ -299,7 +299,11 @@
     "summary": "A modern web app that replaces an old PowerShell desktop tool and follows every repair from device check-in to collection and payment.",
     "tech": [
       "Laravel",
-      "Laragon"
+      "Laragon",
+      "PHP",
+      "Blade",
+      "CSS",
+      "JavaScript"
     ],
     "platform": "web",
     "shots": [
