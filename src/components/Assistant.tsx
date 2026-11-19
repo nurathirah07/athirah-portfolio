@@ -2,32 +2,29 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion } from "motion/react";
 import MiraOrb from "@/components/MiraOrb";
-import { CONFIRM, emptyBrief, fieldFor, lines, previousStep, steps, withAnswer, withoutAnswer, type Brief, type Input, type Mood, type Step } from "@/data/assistant";
+import { CONFIRM, emptyBrief, fieldFor, lines, previousStep, steps, withAnswer, withoutAnswer, type Brief, type Mood, type Step } from "@/data/assistant";
 import { site } from "@/data/site";
 import { scriptedTurn, type Said, type Turn } from "@/lib/miraBrain";
 import { conversation, type Phase, type PhaseEvent } from "@/lib/miraMachine";
 import { useMachine } from "@/lib/useMachine";
-import { enableLiveVoice, isSpeaking, wakeAudio, loudness, preload, speak, speechSeconds, stopSpeaking } from "@/lib/miraVoice";
+import { isSpeaking, wakeAudio, loudness, preload, speak, speechSeconds, stopSpeaking } from "@/lib/miraVoice";
 
 const TYPE_MS = 26; // per letter when a line has no recording
-const AI_WAIT_MS = 9000; // how long to wait for an AI reply before using a written one
 const IDLE_MS = 30_000; // quiet time before she checks in
 const MET = "mira:met"; // remembered on this device: has talked to Mira before
 const SEEN_WORK = "mira:seenWork"; // remembered for this visit: has looked at the projects (set by VisitNote)
 
 type Status = "talking" | "sending" | "sent" | "drafted" | "failed";
-type AiReply = { ai: boolean; reply: string; spoken?: string[]; mood: Mood; step: Step; options: string[]; input: Input; brief: Brief };
 
 // Mira: a friendly assistant who collects a short project brief, one question
 // at a time. She says each line aloud while it types out, and the orb moves
 // with her voice and shows her mood.
 //
-// Two brains can write her lines. The scripted one (src/lib/miraBrain.ts) uses
-// her written, recorded lines and always works. When a Gemini key is set up,
-// the live one (/api/mira) words her replies and understands typed messages;
-// if it is slow or fails, the scripted one answers that turn instead.
+// Her lines are written and recorded ahead of time (src/lib/miraBrain.ts and
+// src/data/assistant.ts), so she answers instantly and works offline: the
+// visitor taps an answer, fills in the short forms, and she replies.
 //
-// Where the conversation is (welcome, asking, thinking, sending…) is one state
+// Where the conversation is (welcome, asking, sending…) is one state
 // machine: src/lib/miraMachine.ts. This component reads its phase and sends it
 // events; it never sets the phase directly. The phase and step are also on the
 // section as data-phase / data-step / data-ready, for tests and debugging.
@@ -42,12 +39,9 @@ export default function Assistant() {
   const seen = inView && started; // Mira is on stage
   const turn = phase.name === "welcome" ? null : phase.turn; // the latest thing Mira said
   const turnId = phase.name === "welcome" ? 0 : phase.id;
-  const thinking = phase.name === "thinking"; // waiting for the AI
-  const status: Status = phase.name === "welcome" || phase.name === "asking" || phase.name === "thinking" ? "talking" : phase.name;
-  const [aiOn, setAiOn] = useState(false);
+  const status: Status = phase.name === "welcome" || phase.name === "asking" ? "talking" : phase.name;
   const [mood, setMood] = useState<Mood>("calm");
   const [aside, setAside] = useState<string | null>(null); // a short remark shown above the orb
-  const [draft, setDraft] = useState(""); // a typed message
   const [details, setDetails] = useState("");
   const [person, setPerson] = useState({ name: "", contact: "" });
   const [copied, setCopied] = useState(false);
@@ -59,7 +53,6 @@ export default function Assistant() {
     backs: 0,
     seenWork: false,
     returning: false,
-    aiFails: 0,
     idles: 0,
     pokes: 0,
     warnedLeaving: false,
@@ -94,16 +87,6 @@ export default function Assistant() {
     timers.current.aside = setTimeout(() => setAside(null), (speechSeconds([line]) || 2.5) * 1000 + 1200);
   };
 
-  // Find out early whether AI is set up.
-  useEffect(() => {
-    fetch("/api/mira", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ping: true }) })
-      .then((res) => res.json())
-      .then((data: { ai?: boolean }) => {
-        setAiOn(!!data.ai);
-      })
-      .catch(() => {});
-  }, []);
-
   // Start pressed on the welcome screen: Mira appears and greets.
   const start = () => {
     wakeAudio(); // this click is what lets the browser play her voice
@@ -133,23 +116,23 @@ export default function Assistant() {
   // Type at the pace of the recording, so the words appear as she says them.
   const seconds = speechSeconds(spoken);
   const pace = seconds ? Math.max(20, Math.min(80, (seconds * 1000) / prompt.length)) : TYPE_MS;
-  const { shown, done } = useTyping(seen && !thinking ? prompt : "", lineId, pace, reduce, () => {
+  const { shown, done } = useTyping(seen ? prompt : "", lineId, pace, reduce, () => {
     if (!isSpeaking()) pulse(); // with no sound, the letters make the orb pulse
   });
 
   // Say each new line aloud as soon as it appears. Coming back to this page
   // (Next keeps it alive, hidden) says the current line again.
   useEffect(() => {
-    if (seen && prompt && !thinking) void speak(spoken, { aiWritten: !!turn?.aiWritten && status === "talking" });
+    if (seen && prompt) void speak(spoken);
     // `spoken` is rebuilt every render; lineId identifies the line.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lineId, seen, thinking]);
+  }, [lineId, seen]);
   // On a phone a long question can push the answers below the screen,
   // and a short one after it can leave the question under the header. Once
   // the answers have appeared, scroll the least needed to show both; if they
   // can't both fit, the start of the question wins.
   const answers = useRef<HTMLDivElement>(null);
-  const showAnswers = done && !thinking && !!turn;
+  const showAnswers = done && !!turn;
   useEffect(() => {
     if (!showAnswers || !window.matchMedia("(max-width: 767px)").matches) return;
     const timer = setTimeout(() => {
@@ -210,12 +193,12 @@ export default function Assistant() {
     }, IDLE_MS);
   };
   useEffect(() => {
-    if (!turn || status !== "talking" || thinking) return;
+    if (!turn || status !== "talking") return;
     const held = timers.current;
     awake();
     return () => clearTimeout(held.idle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [turnId, status, thinking]);
+  }, [turnId, status]);
 
   // If the cursor heads for the top of the window mid-conversation, she offers a quick way out (once).
   useEffect(() => {
@@ -232,45 +215,6 @@ export default function Assistant() {
   }, [status, brief.service, brief.contact]);
 
   // ---------- The conversation ----------
-  // Ask the live AI for Mira's next line. Name and contact stay on this device.
-  const askAI = async (at: Step, answers: Brief, said: Said): Promise<Turn | null> => {
-    try {
-      const { name, contact, ...rest } = answers;
-      const res = await fetch("/api/mira", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          step: at,
-          brief: rest,
-          hasName: !!name,
-          hasContact: !!contact,
-          said: { kind: said.kind, text: "text" in said ? said.text : "" },
-          history: memo.current.history.slice(-12),
-        }),
-        signal: AbortSignal.timeout(AI_WAIT_MS),
-      });
-      const data = (await res.json()) as AiReply;
-      if (!data.ai) throw new Error("AI unavailable");
-      memo.current.aiFails = 0;
-      return {
-        reply: data.reply,
-        // Spoken in parts: her recorded question plays at once in her own voice;
-        // the AI's reaction before it is voiced only if her in-browser voice is quick enough.
-        recorded: data.spoken?.length ? data.spoken : null,
-        aiWritten: true,
-        mood: data.mood,
-        step: data.step,
-        options: data.options,
-        input: data.input,
-        brief: { ...data.brief, name, contact },
-      };
-    } catch {
-      // Two failures in a row: stop asking and stay with the written lines.
-      if (++memo.current.aiFails >= 2) setAiOn(false);
-      return null;
-    }
-  };
-
   /** The visitor did something at step `at`; `answers` already includes it. */
   const act = async (did: Said, answers: Brief, at: Step) => {
     const m = memo.current;
@@ -282,23 +226,14 @@ export default function Assistant() {
     clearTimeout(timers.current.aside);
     setAside(null);
     m.count++;
-    if (did.kind === "tap" || did.kind === "text") m.history.push({ who: "visitor", text: did.text });
+    if (did.kind === "tap") m.history.push({ who: "visitor", text: did.text });
     try {
       localStorage.setItem(MET, "1");
     } catch {
       // not remembered; nothing else depends on it
     }
 
-    let next: Turn | null = null;
-    // The AI handles typed messages, where understanding free text matters. Taps
-    // and forms get her written replies, which have recordings, so her own voice
-    // plays instantly. (AI-written lines can't be recorded ahead of time.)
-    if (aiOn && did.kind === "text" && at !== "summary" && mira.send({ type: "THINK", after: turnId })) {
-      enableLiveVoice(); // her voice for the AI's words: downloaded only once someone types
-      feel("thinking");
-      next = await askAI(at, answers, did);
-    }
-    next ??= scriptedTurn(at, answers, did, context());
+    const next = scriptedTurn(at, answers, did, context());
     if (mira.send({ type: "SAY", turn: next, after: turnId })) said(next);
   };
 
@@ -400,7 +335,7 @@ export default function Assistant() {
       // finished her line and the visitor can answer.
       data-phase={phase.name}
       data-step={started ? step : undefined}
-      data-ready={started ? done && !thinking : undefined}
+      data-ready={started ? done : undefined}
       className="relative flex min-h-[calc(100svh-9rem)] flex-col items-center pb-8 text-center"
       onPointerDown={awake}
       onKeyDown={awake}
@@ -436,12 +371,12 @@ export default function Assistant() {
 
       {/* She grows out of the little light on the welcome screen */}
       <motion.div initial={reduce ? false : { scale: 0.08, opacity: 0.6 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: "spring", stiffness: 140, damping: 14 }}>
-        <MiraOrb energy={energy} pointer={pointer} busy={!done || thinking} pulseKey={seen && turn ? lineId : ""} reduce={reduce} compact={typing && !finished} mood={mood} aside={aside} onPoke={poke} />
+        <MiraOrb energy={energy} pointer={pointer} busy={!done} pulseKey={seen && turn ? lineId : ""} reduce={reduce} compact={typing && !finished} mood={mood} aside={aside} onPoke={poke} />
       </motion.div>
 
       {/* Answers so far; tap one to change it */}
       <div className="flex min-h-9 max-w-3xl flex-wrap justify-center gap-2">
-        {!finished && !thinking && step !== "summary" &&
+        {!finished && step !== "summary" &&
           filled.filter(([, , at]) => at !== step && at !== "details" && at !== "contact").map(([name, value, at]) => (
             <button
               key={name}
@@ -457,26 +392,18 @@ export default function Assistant() {
       </div>
 
       {/* What she says. Screen readers get it whole; the typing is visual only. */}
-      <p className="sr-only" aria-live="polite">{!seen ? "" : thinking ? "One moment…" : prompt}</p>
+      <p className="sr-only" aria-live="polite">{!seen ? "" : prompt}</p>
       <p aria-hidden className="mt-3 flex min-h-[2.8em] max-w-3xl items-start justify-center font-display text-[1.375rem] leading-snug sm:text-2xl md:mt-4 md:text-4xl">
-        {thinking ? (
-          <span className="mt-3 flex gap-2">
-            {[0, 1, 2].map((i) => (
-              <span key={i} className="h-2.5 w-2.5 animate-bounce rounded-full bg-gold [animation-duration:0.9s]" style={{ animationDelay: `${i * 0.15}s` }} />
-            ))}
-          </span>
-        ) : (
-          <span>
-            {shown}
-            {!done && seen && <span className="ml-1 inline-block h-[0.85em] w-0.75 translate-y-[0.1em] animate-pulse bg-gold" />}
-          </span>
-        )}
+        <span>
+          {shown}
+          {!done && seen && <span className="ml-1 inline-block h-[0.85em] w-0.75 translate-y-[0.1em] animate-pulse bg-gold" />}
+        </span>
       </p>
 
       {/* How the visitor answers */}
       <div ref={answers} className="mt-4 w-full max-w-3xl md:mt-5">
         <AnimatePresence mode="wait">
-          {done && !thinking && turn && (
+          {done && turn && (
             <motion.div
               key={lineId}
               initial={{ opacity: 0, y: 16 }}
@@ -516,27 +443,6 @@ export default function Assistant() {
                 </div>
               )}
 
-              {/* With AI on, visitors can also just type */}
-              {status === "talking" && aiOn && turn.input === "options" && step !== "summary" && (
-                <form
-                  className="mt-5 w-full max-w-md"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const text = draft.trim();
-                    if (!text) return;
-                    setDraft("");
-                    void act({ kind: "text", text }, brief, step);
-                  }}
-                >
-                  <div className="glass flex items-center gap-2 rounded-full p-1.5 pl-5">
-                    <label htmlFor="mira-type" className="sr-only">Or type your answer</label>
-                    <input id="mira-type" value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={300} autoComplete="off" placeholder="Or type your answer…" className="min-w-0 flex-1 bg-transparent py-2 text-sm outline-none placeholder:text-cream/40" />
-                    <button type="submit" aria-label="Send" className="btn-gloss grid h-9 w-9 shrink-0 place-items-center rounded-full">↑</button>
-                  </div>
-                  <p className="mt-2 text-xs text-cream/55">Typed messages are read by Google&apos;s Gemini AI. Please don&apos;t include private details.</p>
-                </form>
-              )}
-
               {/* A sentence or two about the idea (optional) */}
               {status === "talking" && turn.input === "text" && (
                 <form
@@ -550,7 +456,6 @@ export default function Assistant() {
                     <span className={label}>Your idea (optional)</span>
                     <textarea rows={3} maxLength={600} value={details} onChange={(e) => setDetails(e.target.value)} className={`${field} resize-none`} placeholder="What is it for, who will use it, anything you already have…" />
                   </label>
-                  {aiOn && <p className="mt-2 text-xs text-cream/55">This is read by Google&apos;s Gemini AI to word Mira&apos;s reply.</p>}
                   <div className="mt-4 flex items-center justify-between gap-4">
                     <button type="button" onClick={goBack} className={back}>← Back</button>
                     <div className="flex items-center gap-4">

@@ -2,11 +2,8 @@
 // what they need one question at a time, and collects a short project brief
 // for you to follow up on.
 //
-// Everything she can say without AI, and every option she offers, is written
-// here. Edit freely, but note:
-//   - After changing any line in `lines`, run `npm run voice` to record it.
-//   - With a Gemini key set up, Mira words her replies live with AI (see
-//     src/app/api/mira/route.ts) but still uses the steps and options below.
+// Everything she says, and every option she offers, is written here. Edit
+// freely, but after changing any line in `lines`, run `npm run voice` to record it.
 
 export const assistantName = "Mira";
 

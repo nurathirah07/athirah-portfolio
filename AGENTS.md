@@ -14,9 +14,8 @@ Anything with more than two states is an explicit state machine, not a set of bo
 
 | Machine | Where | States | Visible in the DOM as |
 |---|---|---|---|
-| Mira's conversation | `src/lib/miraMachine.ts` | welcome, asking, thinking, sending, sent, drafted, failed | `data-phase`, `data-step`, `data-ready` on `section[aria-labelledby=assistant-title]` |
+| Mira's conversation | `src/lib/miraMachine.ts` | welcome, asking, sending, sent, drafted, failed | `data-phase`, `data-step`, `data-ready` on `section[aria-labelledby=assistant-title]` |
 | Mira's questions | `steps`, `nextStep`, `previousStep`, `withAnswer`, `withoutAnswer` in `src/data/assistant.ts` | greeting … summary | `data-step` (same section) |
-| In-browser voice | `live` in `src/lib/miraVoice.ts` | off, unavailable, loading, ready, failed | `voiceStatus()` |
 | Page transition | `src/components/Curtain.tsx` | idle, covering, revealing | `data-phase` on the curtain |
 | Phone and tablet menu | `src/components/Menu.tsx` | closed, opening, open, closing | `data-phase` on `#site-menu` |
 | Project reel | `src/components/VideoBackdrop.tsx` | idle, loading, paused, playing, failed (or `still`: poster only) | `data-state` on the reel |

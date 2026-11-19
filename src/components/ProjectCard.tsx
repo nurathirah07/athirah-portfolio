@@ -3,6 +3,7 @@ import { useRef } from "react";
 import { motion } from "motion/react";
 import { Browser, Phone } from "@/components/DeviceFrames";
 import TransitionLink from "@/components/TransitionLink";
+import VideoBackdrop from "@/components/VideoBackdrop";
 import ViewButton from "@/components/ViewButton";
 import { shotsFor, type Project } from "@/data/site";
 
@@ -20,7 +21,12 @@ function Media({ p }: { p: Project }) {
       <div aria-hidden className="tech-grid absolute inset-0 opacity-60" />
       <div aria-hidden className="absolute inset-x-[15%] top-[20%] h-full rounded-full bg-[radial-gradient(closest-side,rgb(224_202_60/0.16),transparent)] blur-2xl" />
 
-      {!main ? (
+      {p.video ? (
+        // With a reel: it fills the whole picture area (the reel already shows the
+        // screens in their windows). Its first frame shows at rest; it plays while
+        // the card is pointed at, or on phones while the card is in the middle of the screen.
+        <VideoBackdrop video={p.video} fallback={main} mode="hover" dim={0} vignette={false} sizes="(min-width: 1024px) 33vw, 90vw" className="transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
+      ) : !main ? (
         <div className="absolute inset-0 grid place-items-center">
           <p aria-hidden className="font-display text-7xl text-cream/10">{p.title.split(" ")[0]}</p>
           <span className="absolute bottom-4 left-4 rounded-full border border-cream/15 bg-ink/40 px-3 py-1 font-accent text-[13px] text-cream/70 backdrop-blur">Screenshots coming soon</span>
@@ -28,7 +34,7 @@ function Media({ p }: { p: Project }) {
       ) : site && phone ? (
         <>
           <div className={`absolute inset-x-6 right-[22%] top-7 ${lift}`}>
-            <Browser shot={site} video={p.video} videoMode="hover" />
+            <Browser shot={site} />
           </div>
           <div className={`absolute right-[7%] top-12 h-[140%] ${lift} delay-75`}>
             <Phone shot={phone} className="h-full rotate-3" />
@@ -47,7 +53,7 @@ function Media({ p }: { p: Project }) {
         </>
       ) : (
         <div className={`absolute inset-x-6 top-7 ${lift}`}>
-          <Browser shot={main} video={p.video} videoMode="hover" />
+          <Browser shot={main} />
         </div>
       )}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-linear-to-t from-[#04170e] to-transparent" />

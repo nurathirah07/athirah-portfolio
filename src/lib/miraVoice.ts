@@ -1,24 +1,15 @@
 // Mira's voice.
 //
-// Her written lines are recordings (made by `npm run voice`), so they start at
-// once. Replies the AI writes live have no recording; for those, the same
-// Kokoro voice runs in the visitor's browser (see kokoro.worker.ts), once it
-// has been switched on with enableLiveVoice() and has finished loading.
+// Every line she says is a recording (made by `npm run voice`), so it starts at once.
 //
 // Browsers only let a page make sound after the visitor has clicked, tapped or
 // pressed a key somewhere on the site. Arriving on the Contact page through a
 // link counts, so Mira speaks straight away. If someone opens the Contact page
 // directly, her first line waits and plays on their first click, tap or key press.
 import recorded from "@/data/mira-audio.json";
-import { createMachine } from "./machine";
 
 const lines = recorded.lines as Record<string, { src: string; seconds: number }>;
 const GAP = 0.18; // seconds of quiet between two lines
-const LIVE_WAIT_MS = 2500; // longest wait for the in-browser voice before going on without it
-
-// Resolves with null if the promise takes longer than `ms`.
-const withinTime = <T,>(promise: Promise<T | null>, ms: number) =>
-  Promise.race([promise, new Promise<null>((done) => setTimeout(() => done(null), ms))]);
 
 let ctx: AudioContext | null = null;
 let analyser: AnalyserNode | null = null;
@@ -73,86 +64,10 @@ export function wakeAudio() {
   if (audio.state !== "running") void audio.resume().catch(() => {});
 }
 
-// ---------- The live voice, for lines without a recording ----------
-// Where the in-browser Kokoro voice stands:
-// - off:         not asked for yet.
-// - unavailable: this device or connection is too weak for it (final).
-// - loading:     the model is downloading and starting up.
-// - ready:       it can speak.
-// - failed:      it broke while loading or speaking (final).
-type Live = { name: "off" } | { name: "unavailable" } | { name: "loading" } | { name: "ready" } | { name: "failed" };
-type LiveEvent = { type: "LOAD" } | { type: "SKIP" } | { type: "READY" } | { type: "BROKE" };
-const live = createMachine<Live, LiveEvent>(
-  { name: "off" },
-  {
-    off: { LOAD: () => ({ name: "loading" }), SKIP: () => ({ name: "unavailable" }) },
-    loading: { READY: () => ({ name: "ready" }), BROKE: () => ({ name: "failed" }) },
-    ready: { BROKE: () => ({ name: "failed" }) },
-    unavailable: {},
-    failed: {},
-  },
-);
-
-let worker: Worker | null = null;
-let jobId = 0;
-const jobs = new Map<number, (buffer: AudioBuffer | null) => void>();
-
-// The voice broke: nothing more will come back, so let every waiting line go (unspoken).
-function liveBroke() {
-  if (!live.send({ type: "BROKE" })) return;
-  for (const done of jobs.values()) done(null);
-  jobs.clear();
-  worker?.terminate();
-  worker = null;
-}
-
-/** Start loading the in-browser voice. Safe to call more than once: only the first call does anything. */
-export function enableLiveVoice() {
-  if (!live.can("LOAD")) return;
-  // It is a large download and heavy work: skip it on data-saver, slow connections and weak devices.
-  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
-  const weak = connection?.saveData || /2g|3g/.test(connection?.effectiveType ?? "") || (navigator.hardwareConcurrency ?? 4) < 4;
-  if (typeof Worker === "undefined" || weak) return void live.send({ type: "SKIP" });
-  live.send({ type: "LOAD" });
-  try {
-    worker = new Worker(new URL("./kokoro.worker.ts", import.meta.url), { type: "module" });
-  } catch {
-    return liveBroke();
-  }
-  worker.onmessage = ({ data }: MessageEvent<{ ready?: boolean; id?: number; samples?: Float32Array; rate?: number }>) => {
-    if (data.ready !== undefined) {
-      if (data.ready) live.send({ type: "READY" });
-      else liveBroke();
-      return;
-    }
-    const done = jobs.get(data.id!);
-    jobs.delete(data.id!);
-    if (!done) return;
-    if (!data.samples || !data.rate) return done(null);
-    const buffer = context().createBuffer(1, data.samples.length, data.rate);
-    buffer.getChannelData(0).set(data.samples);
-    done(buffer);
-  };
-  worker.onerror = liveBroke;
-  worker.postMessage({ type: "load" });
-}
-
-/** For debugging: whether sound is allowed yet, and where the in-browser voice stands. */
+/** For debugging: whether sound is allowed yet, and whether she is speaking. */
 export function voiceStatus() {
-  return { sound: ctx?.state ?? "not started", liveVoice: live.get().name, speaking: isSpeaking() };
+  return { sound: ctx?.state ?? "not started", speaking: isSpeaking() };
 }
-
-function synth(text: string) {
-  return new Promise<AudioBuffer | null>((resolve) => {
-    if (!worker) return resolve(null);
-    const id = ++jobId;
-    jobs.set(id, resolve);
-    worker.postMessage({ type: "say", id, text, speed: recorded.voice.speed });
-  });
-}
-
-// One sentence at a time, so the first words can start while the rest is prepared.
-const sentences = (text: string) => text.match(/[^.!?…]+[.!?…]+["')\]]*\s*|[^.!?…]+$/g)?.map((s) => s.trim()).filter(Boolean) ?? [text];
 
 // ---------- Speaking ----------
 /** How long these lines take to say, in seconds, when all of them are recorded (0 otherwise). */
@@ -176,8 +91,8 @@ function missing(text: string) {
   }
 }
 
-// Last resort for a line with neither a recording nor the in-browser Kokoro
-// voice: the browser's own speech, so Mira is never silent. It sounds
+// Last resort for a line without a recording: the browser's own speech, so
+// Mira is never silent. It sounds
 // different from her usual voice.
 const FALLBACK_VOICES = [/natural/i, /aria/i, /jenny/i, /samantha/i, /google us english/i, /zira/i, /female/i];
 function sayWithBrowser(text: string) {
@@ -193,11 +108,10 @@ function sayWithBrowser(text: string) {
 }
 
 /**
- * Say these lines in order, replacing anything being said. Recorded lines play
- * from their recordings; others use the in-browser Kokoro voice when it is
- * ready, and otherwise the browser's own voice.
+ * Say these lines in order, replacing anything being said, from their
+ * recordings (or, if one is missing, in the browser's own voice).
  */
-export async function speak(texts: string[], { aiWritten = false }: { aiWritten?: boolean } = {}) {
+export async function speak(texts: string[]) {
   stopSpeaking();
   // For tests and debugging: what she was last asked to say.
   if (process.env.NODE_ENV !== "production") (window as Window & { __miraSaid?: string[][] }).__miraSaid?.push(texts);
@@ -205,22 +119,12 @@ export async function speak(texts: string[], { aiWritten = false }: { aiWritten?
   const unrecorded = texts.filter((t) => !lines[t]);
   // A written line without a recording is a mistake (`npm run voice` wasn't
   // run): say so, and read it in the browser's own voice rather than not at all.
-  if (!aiWritten && unrecorded.length) {
+  if (unrecorded.length) {
     for (const t of unrecorded) missing(t);
-    if (live.get().name !== "ready") {
-      sayWithBrowser(texts.join(" "));
-      return;
-    }
+    sayWithBrowser(texts.join(" "));
+    return;
   }
-  // Lines the AI wrote live never have recordings. They're voiced in her own
-  // voice only when the in-browser voice is ready and quick; otherwise they're
-  // shown but not spoken, so she never switches to a different voice and her
-  // recorded question isn't kept waiting.
-  const parts: Promise<AudioBuffer | null>[] = [];
-  for (const t of texts) {
-    if (lines[t]) parts.push(load(lines[t].src).catch(() => null));
-    else if (live.get().name === "ready") for (const sentence of sentences(t)) parts.push(withinTime(synth(sentence), LIVE_WAIT_MS));
-  }
+  const parts = texts.map((t) => load(lines[t].src).catch(() => null));
   if (parts.length === 0) return;
   const audio = context();
   // Switching sound on takes a moment; wait for it (briefly) rather than
@@ -262,7 +166,6 @@ export function stopSpeaking() {
     }
   }
   playing = [];
-  if (jobs.size) worker?.postMessage({ type: "cancel" });
   if (typeof speechSynthesis !== "undefined" && speechSynthesis.speaking) speechSynthesis.cancel();
 }
 

@@ -23,7 +23,6 @@ export type Turn = {
   /** The lines that say it aloud, in order. Written lines have recordings; null means speak `reply` as one line. */
   recorded: string[] | null;
   /** Written live by the AI, so some of its lines have no recording (and that's expected). */
-  aiWritten?: boolean;
   mood: Mood;
   step: Step;
   options: string[];

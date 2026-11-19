@@ -1,6 +1,5 @@
 import Image from "next/image";
-import VideoBackdrop from "@/components/VideoBackdrop";
-import type { Reel, Shot } from "@/data/site";
+import type { Shot } from "@/data/site";
 
 // Bezel as a share of the phone's height (top/bottom) and width (left/right).
 // They give an even bezel on a ~1:2 phone.
@@ -39,23 +38,9 @@ export function Phone({ shot, className = "", style }: { shot: Shot; className?:
   );
 }
 
-// A slim browser window for website screenshots.
-// With `video`, the window plays the project's reel (16:9) instead of showing the
-// screenshot: all the time it's on screen, or with `videoMode="hover"` only while
-// its card is pointed at.
-export function Browser({
-  shot,
-  className = "",
-  fill = false,
-  video,
-  videoMode = "auto",
-}: {
-  shot: Shot;
-  className?: string;
-  fill?: boolean;
-  video?: Reel;
-  videoMode?: "auto" | "hover";
-}) {
+// A slim browser window for website screenshots. (Project reels are never shown
+// inside one: they already show the screens in their own windows.)
+export function Browser({ shot, className = "", fill = false }: { shot: Shot; className?: string; fill?: boolean }) {
   return (
     <div className={`flex flex-col overflow-hidden rounded-xl border border-cream/15 bg-[#0a1d14] shadow-[0_30px_60px_-25px_rgb(0_0_0/0.9)] ${className}`}>
       <div aria-hidden className="flex shrink-0 items-center gap-1.5 border-b border-cream/10 px-3 py-2">
@@ -64,11 +49,7 @@ export function Browser({
         <span className="h-2 w-2 rounded-full bg-spruce" />
         <span className="ml-2 h-2 flex-1 rounded-full bg-cream/8" />
       </div>
-      {video ? (
-        <div className="relative aspect-video">
-          <VideoBackdrop video={video} fallback={shot} mode={videoMode} dim={0} vignette={false} sizes="(min-width: 768px) 55vw, 90vw" />
-        </div>
-      ) : fill ? (
+      {fill ? (
         <div className="relative min-h-0 flex-1">
           <Image src={shot.src} alt={shot.alt} fill sizes="(min-width: 768px) 50vw, 90vw" className="object-cover object-top" />
         </div>

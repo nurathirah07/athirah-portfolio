@@ -63,21 +63,8 @@ test("a question is answered exactly once (double clicks and stale replies are i
   mira.send({ type: "START", turn: greeting });
   assert.equal(mira.send({ type: "SAY", turn: greeting, after: 1 }), true);
   assert.equal(mira.send({ type: "SAY", turn: greeting, after: 1 }), false, "second answer to turn 1");
-  assert.equal(mira.send({ type: "THINK", after: 1 }), false, "stale thinking");
   const now = mira.get();
   assert.equal(now.name === "asking" && now.id, 2);
-});
-
-test("while the AI is thinking, only its reply to that turn moves things on", () => {
-  const mira = newConversation();
-  mira.send({ type: "START", turn: greeting });
-  assert.equal(mira.send({ type: "THINK", after: 1 }), true);
-  assert.equal(mira.get().name, "thinking");
-  assert.equal(mira.send({ type: "THINK", after: 1 }), false);
-  assert.equal(mira.send({ type: "SEND" }), false);
-  assert.equal(mira.send({ type: "SAY", turn: greeting, after: 7 }), false);
-  assert.equal(mira.send({ type: "SAY", turn: greeting, after: 1 }), true);
-  assert.equal(mira.get().name, "asking");
 });
 
 test("the brief can only be sent from the summary, and only once", () => {
