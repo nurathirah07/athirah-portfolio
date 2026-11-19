@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef } from "react";
+import Icon from "@/components/Icon";
 import type { Shot } from "@/data/site";
 
 // One screenshot at full width, over everything, for a proper look on a small
@@ -36,7 +37,7 @@ export default function ShotViewer({ shot, onClose }: { shot: Shot | null; onClo
               onClick={() => dialog.current?.close()}
               className="shrink-0 rounded-full border border-cream/25 px-4 py-2 font-accent text-xs text-cream transition-colors hover:border-gold hover:text-gold"
             >
-              Close ✕
+              Close <Icon name="close" className="ml-0.5" />
             </button>
           </div>
           <div className="flex flex-1 flex-col items-center justify-center">

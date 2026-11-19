@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { preload } from "react-dom";
 import "./globals.css";
 import Nav from "@/components/Nav";
 import Cursor from "@/components/Cursor";
@@ -18,13 +19,22 @@ export const metadata: Metadata = {
   openGraph: { title: `${site.name} — ${site.role}`, description: site.tagline, type: "website", siteName: site.name },
 };
 
+// Runs before the loading screen is drawn: the first full page load of a visit
+// shows it; later ones in the same tab (a refresh, a typed address) skip it.
+const INTRO_ONCE = `try{if(sessionStorage.getItem("intro"))document.documentElement.dataset.intro="seen";else sessionStorage.setItem("intro","1")}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  // Fetch the font with the page, not once the stylesheet asks for it, so text
+  // is drawn in Manrope from the start instead of being laid out twice.
+  preload("/fonts/manrope-latin-v1.woff2", { as: "font", type: "font/woff2", crossOrigin: "anonymous" });
   return (
     // suppressHydrationWarning: browser extensions (e.g. QuillBot) add their own
-    // attributes to <html> before React starts; this only ignores those, on this one element.
+    // attributes to <html> before React starts, and so does INTRO_ONCE
+    // (data-intro); this only ignores those, on this one element.
     <html lang="en" className="antialiased" suppressHydrationWarning>
       <body className="min-h-screen">
-        {/* Loading screen, shown once per full page load. Pure CSS, so it appears before any script runs. */}
+        {/* Loading screen, on the first page of a visit. Pure CSS (plus the one-line check above it), so it appears before the site's scripts run. */}
+        <script dangerouslySetInnerHTML={{ __html: INTRO_ONCE }} />
         <div aria-hidden className="intro">
           <div className="intro-ring">
             {Array.from({ length: 8 }, (_, i) => (

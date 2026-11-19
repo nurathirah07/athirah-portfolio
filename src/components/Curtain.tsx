@@ -8,8 +8,8 @@ import { useMachine } from "@/lib/useMachine";
 import { site } from "@/data/site";
 
 const EASE = [0.76, 0, 0.24, 1] as const;
-const DURATION = 0.6;
-const RING = 0.09; // seconds the gold edge runs ahead of the dark disc
+const DURATION = 0.45; // each way: about a second per page change in all
+const RING = 0.07; // seconds the gold edge runs ahead of the dark disc
 const GIVE_UP_MS = 10_000; // how long to keep the screen covered waiting for a page that isn't arriving
 
 type Trip = CurtainRequest & { radius: number };
@@ -97,8 +97,8 @@ export default function Curtain() {
       return () => clearTimeout(giveUp);
     }
     if (phase.name === "revealing") {
-      animate(disc, 0, { duration: DURATION, delay: 0.1, ease: EASE });
-      animate(rim, 0, { duration: DURATION, delay: 0.1 + RING, ease: EASE }).then(() => {
+      animate(disc, 0, { duration: DURATION, delay: 0.05, ease: EASE });
+      animate(rim, 0, { duration: DURATION, delay: 0.05 + RING, ease: EASE }).then(() => {
         if (rim.get() <= 1) curtain.send({ type: "UNCOVERED" });
       });
     }

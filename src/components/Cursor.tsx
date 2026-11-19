@@ -1,16 +1,30 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 
 type Mode = "default" | "link" | "reveal" | "label";
 
 const SIZE: Record<Mode, number> = { default: 12, link: 56, reveal: 96, label: 84 };
 
+// Only for a real mouse. Touch screens (and the server) get nothing at all,
+// rather than an animated dot nobody can see.
+const MOUSE = "(hover: hover) and (pointer: fine)";
+const watchMouse = (update: () => void) => {
+  const list = window.matchMedia(MOUSE);
+  list.addEventListener("change", update);
+  return () => list.removeEventListener("change", update);
+};
+const hasMouse = () => window.matchMedia(MOUSE).matches;
+
+export default function Cursor() {
+  return useSyncExternalStore(watchMouse, hasMouse, () => false) ? <MouseCursor /> : null;
+}
+
 // A glowing dot that follows the mouse. It grows over links, and becomes an
 // open ring over the portrait so the colour underneath stays visible. Over an
 // element with data-cursor-label it becomes a gold badge showing that word,
 // e.g. "View" on a project card.
-export default function Cursor() {
+function MouseCursor() {
   const x = useMotionValue(-100);
   const y = useMotionValue(-100);
   const sx = useSpring(x, { stiffness: 500, damping: 40 });
@@ -19,7 +33,6 @@ export default function Cursor() {
   const [label, setLabel] = useState("");
 
   useEffect(() => {
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
     const root = document.documentElement;
     root.classList.add("has-cursor");
 

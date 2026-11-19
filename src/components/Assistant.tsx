@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion } from "motion/react";
+import Icon from "@/components/Icon";
 import MiraOrb from "@/components/MiraOrb";
 import { CONFIRM, emptyBrief, fieldFor, lines, previousStep, steps, withAnswer, withoutAnswer, type Brief, type Mood, type Step } from "@/data/assistant";
 import { site } from "@/data/site";
@@ -382,7 +383,7 @@ export default function Assistant() {
               aria-label={`Change ${name.toLowerCase()}: ${value}`}
               className="rounded-full border border-cream/15 px-3 py-1.5 text-xs text-cream/60 transition-colors hover:border-gold hover:text-gold"
             >
-              {value} <span aria-hidden>✎</span>
+              {value} <Icon name="edit" className="ml-0.5" />
             </button>
           ))}
       </div>
@@ -415,7 +416,7 @@ export default function Assistant() {
                     <div key={name} className="flex items-start justify-between gap-4 border-b border-cream/10 py-2.5 last:border-0">
                       <dt className="w-20 shrink-0 pt-0.5 font-accent text-[13px] text-cream/65">{name}</dt>
                       <dd className="min-w-0 flex-1 break-words text-sm text-cream md:text-base">{value}</dd>
-                      <button type="button" data-step={at} onClick={editClicked} aria-label={`Change ${name.toLowerCase()}`} className="shrink-0 text-sm text-cream/70 md:text-cream/45 hover:text-gold">✎</button>
+                      <button type="button" data-step={at} onClick={editClicked} aria-label={`Change ${name.toLowerCase()}`} className="shrink-0 p-1 text-sm text-cream/70 md:text-cream/45 hover:text-gold"><Icon name="edit" /></button>
                     </div>
                   ))}
                 </dl>

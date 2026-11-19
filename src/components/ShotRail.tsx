@@ -249,6 +249,8 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
           {items.map((s, i) => {
             const on = focus === i;
             return (
+              // The screens not in focus dim and shrink; on wider screens they blur too
+              // (phones skip the blur: redrawing it on every tap made them stutter).
               <li
                 key={i}
                 // Copies after the first set are only there to fill the loop.
@@ -258,7 +260,7 @@ export default function ShotRail({ shots, platform }: { shots: Shot[]; platform:
                 data-focused={on || undefined}
                 onClick={reduce ? () => setViewing(s) : undefined}
                 className={`relative shrink-0 px-4 transition-[scale,opacity,filter] duration-500 ease-out md:px-7 ${
-                  grabbing ? "scale-[0.97]" : focus === null ? "" : on ? "z-10 scale-110" : "scale-95 opacity-35 blur-[3px]"
+                  grabbing ? "scale-[0.97]" : focus === null ? "" : on ? "z-10 scale-110" : "scale-95 opacity-35 md:blur-[3px]"
                 }`}
               >
                 {deviceOf(s, platform) === "mobile" ? (

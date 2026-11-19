@@ -8,7 +8,7 @@ import { photos } from "@/data/photos";
 import { site } from "@/data/site";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-const AFTER_LOADING = 2.3; // seconds: on a full page load, waits for the loading screen to lift
+const AFTER_LOADING = 1.35; // seconds: on the first load of a visit, waits for the loading screen to lift
 const AFTER_TRANSITION = 0.5; // seconds: arriving from another page, waits for the page transition
 const NAME_COPIES = [0, 1, 2, 3];
 // The two echoes are drawn in dots (see Dotted), which read lighter than a
@@ -21,8 +21,11 @@ const ECHOES = [
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
-  // The loading screen only plays in the first seconds after a full page load.
-  const [START, setStart] = useState(() => (typeof performance !== "undefined" && performance.now() > 3000 ? AFTER_TRANSITION : AFTER_LOADING));
+  // The loading screen only plays on the first full page load of a visit (see
+  // layout.tsx), and only in its first seconds.
+  const [START, setStart] = useState(() =>
+    typeof document === "undefined" || document.documentElement.dataset.intro === "seen" || performance.now() > 2500 ? AFTER_TRANSITION : AFTER_LOADING,
+  );
   // Next keeps visited pages alive (hidden) instead of unmounting them, so this
   // state would otherwise keep the long first-load delay. When the page is
   // hidden, switch to the short delay for every later visit.

@@ -1,5 +1,6 @@
 import Assistant from "@/components/Assistant";
 import ContactBackdrop from "@/components/ContactBackdrop";
+import Icon from "@/components/Icon";
 import LocalTime from "@/components/LocalTime";
 import Reveal from "@/components/Reveal";
 import RollText from "@/components/RollText";
@@ -12,8 +13,8 @@ export default function Contact() {
     { label: "Email", value: site.email, href: `mailto:${site.email}` },
     { label: "Based in", value: site.location },
     { label: "Time zone", value: <LocalTime /> },
-    { label: "GitHub", value: "View profile ↗", href: site.links.github },
-    { label: "LinkedIn", value: "View profile ↗", href: site.links.linkedin },
+    { label: "GitHub", value: "View profile", href: site.links.github, opensElsewhere: true },
+    { label: "LinkedIn", value: "View profile", href: site.links.linkedin, opensElsewhere: true },
     { label: "Resume", value: "Download PDF ↓", href: site.links.resume },
   ].filter((d) => d.href !== "");
 
@@ -40,6 +41,7 @@ export default function Contact() {
                   {d.href ? (
                     <a href={d.href} target={d.href.startsWith("http") ? "_blank" : undefined} download={d.href.endsWith(".pdf") ? "Nur Athirah Azmi - Resume.pdf" : undefined} rel="noreferrer" className="-my-3 inline-block py-3 hover:text-gold">
                       <RollText>{d.value}</RollText>
+                      {d.opensElsewhere && <Icon name="external" className="ml-1.5" />}
                     </a>
                   ) : (
                     d.value

@@ -12,3 +12,13 @@ const watch = (update: () => void) => {
 export function usePhone() {
   return useSyncExternalStore(watch, () => window.matchMedia(query).matches, () => false);
 }
+
+// The opposite question, with the opposite starting answer: true on wider
+// screens, but false on the server and in the first paint. For choosing a
+// heavy desktop-only version of something (many animated layers): the light
+// version is built first everywhere, so phones never build the heavy one only
+// to throw it away a moment later. Navigating within the site renders straight
+// away with the real answer; only a full page load starts light.
+export function useWide() {
+  return useSyncExternalStore(watch, () => !window.matchMedia(query).matches, () => false);
+}

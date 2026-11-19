@@ -128,15 +128,20 @@ function Frame({
   // that doesn't suit the screen's shape fades to its whole, uncropped version.
   const settled = useTransform(geo, (g) => (fit === "cover" ? 0 : g.e));
   const croppedOpacity = useTransform(settled, (v) => 1 - v);
-  const img = { quality: 90, priority: true } as const;
+  // Only the first photo is fetched ahead of everything (it is the first thing
+  // seen). Marking them all urgent made phones download every photo at once,
+  // before the page itself could show; the rest load as they come near.
+  const img = { quality: 90, ...(index === 0 ? { priority: true } : { loading: "lazy" as const }) };
 
   return (
     // No will-change here: with it the browser keeps the photo at the small size
     // it had when the zoom began and stretches that, so it looks blurry.
     <motion.div style={{ x, y, scale, width, height }} className="absolute left-0 top-0">
       <motion.div
-        initial={reduce ? false : { opacity: 0, filter: "blur(14px)" }}
-        animate={{ opacity: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
+        // Fades and grows in (opacity and scale only: animating a blur repainted
+        // every photo each frame, which phones couldn't keep up with).
+        initial={reduce ? false : { opacity: 0, scale: 0.96 }}
+        animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, delay: 0.55 + index * 0.12, ease: EASE }}
         className="absolute inset-0"
       >

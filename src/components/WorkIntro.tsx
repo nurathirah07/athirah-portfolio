@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import WorkBackdrop from "@/components/WorkBackdrop";
 import { projects, workTiles } from "@/data/site";
-import { usePhone } from "@/lib/usePhone";
+import { useWide } from "@/lib/usePhone";
 import { usePrefersStill } from "@/lib/usePrefersStill";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -67,9 +67,11 @@ export default function WorkIntro() {
   const [beat, setBeat] = useState(0);
   // On a phone the words are much bigger, so they only sway near the middle
   // instead of crossing the whole screen (and running off its edges).
-  const phone = usePhone();
+  // The light version (CSS animation, one layer per word) on phones and in
+  // every first paint; the letter trails only once a wide screen is confirmed.
+  const lite = !useWide();
   // "My" stays above "Projects" there, so it always reads in order.
-  const place = (w: Word, row: 0 | 1): Word => (phone ? { x: 50 + (w.x - 50) * 0.2, y: (row ? 57 : 43) + (w.y - 50) * 0.1 } : w);
+  const place = (w: Word, row: 0 | 1): Word => (lite ? { x: 50 + (w.x - 50) * 0.2, y: (row ? 57 : 43) + (w.y - 50) * 0.1 } : w);
 
   useEffect(() => {
     if (reduce) return;
@@ -104,7 +106,7 @@ export default function WorkIntro() {
             if (!img) return null;
             // Phones: a CSS pop-in that runs on the graphics chip. The springs
             // below are driven from JavaScript every frame, which made phones stutter.
-            if (phone)
+            if (lite)
               return (
                 <div
                   key={`${beat}-${i}`}
@@ -139,7 +141,7 @@ export default function WorkIntro() {
         </AnimatePresence>
 
         {words.map(([word, pos], i) => (
-          phone ? (
+          lite ? (
             <LiteWord key={word} word={word} pos={pos} order={i} />
           ) : (
             <TrailWord key={word} word={word} pos={pos} order={i} echoes={reduce ? 0 : ECHOES} />

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "motion/react";
-import { usePhone } from "@/lib/usePhone";
 
 type Source = { kind: "text"; text: string } | { kind: "image"; src: string };
 
@@ -17,7 +16,6 @@ type Source = { kind: "text"; text: string } | { kind: "image"; src: string };
 export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 221)", radius = 85 }: { source: Source; gap?: number; dot?: number; color?: string; radius?: number }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
-  const phone = usePhone();
   const key = source.kind === "text" ? source.text : source.src;
 
   useEffect(() => {
@@ -25,6 +23,10 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
     const host = c?.parentElement;
     if (!c || !host) return;
     const ctx = c.getContext("2d")!;
+    // Read here rather than from usePhone: that answers "not a phone" in the
+    // first paint, which drew every name at desktop density first on phones.
+    const phone = window.matchMedia("(max-width: 767px)").matches;
+    let stopped = false; // set on cleanup, so an unfinished drawing is dropped
     // Each dot: its home position and how far it has been pushed from it.
     let hx = new Float32Array(0);
     let hy = new Float32Array(0);
@@ -61,7 +63,7 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
       const r = host.getBoundingClientRect();
       w = r.width;
       h = r.height;
-      if (!w || !h) return;
+      if (!w || !h || stopped) return;
       // Phones draw at a slightly lower resolution: the dots are tiny either way.
       const dpr = Math.min(window.devicePixelRatio || 1, phone ? 1.5 : 2);
       c.width = Math.round(w * dpr);
@@ -75,6 +77,7 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
       if (source.kind === "text") {
         const cs = getComputedStyle(host);
         await document.fonts.load(`800 ${cs.fontSize} ${cs.fontFamily}`).catch(() => {});
+        if (stopped) return;
         o.font = `800 ${cs.fontSize} ${cs.fontFamily}`;
         const m = o.measureText(source.text);
         const asc = m.fontBoundingBoxAscent || parseFloat(cs.fontSize) * 0.8;
@@ -86,7 +89,7 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
         const img = new Image();
         img.src = source.src;
         await img.decode().catch(() => {});
-        if (!img.naturalWidth) return;
+        if (stopped || !img.naturalWidth) return;
         o.drawImage(img, 0, 0, w, h);
       }
       const data = o.getImageData(0, 0, off.width, off.height).data;
@@ -178,6 +181,7 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
     window.addEventListener("pointerup", lifted, { passive: true });
     window.addEventListener("pointercancel", lifted, { passive: true });
     return () => {
+      stopped = true;
       cancelAnimationFrame(raf);
       seen.disconnect();
       resize.disconnect();
@@ -188,7 +192,7 @@ export default function Dotted({ source, gap = 4, dot = 2, color = "rgb(243 239 
     };
     // `source` is described by `key`; the other props are fixed for a given use.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key, phone, reduce]);
+  }, [key, reduce]);
 
   return <canvas ref={canvas} aria-hidden className="pointer-events-none absolute inset-0 h-full w-full" />;
 }

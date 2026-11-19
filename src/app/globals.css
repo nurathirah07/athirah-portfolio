@@ -1,10 +1,14 @@
 @import "tailwindcss";
 
 /* ---------- Fonts ----------
-   Manrope (SIL Open Font License, Google Fonts). */
+   Manrope (SIL Open Font License, Google Fonts), all weights, cut down to Latin
+   with accents, punctuation and arrows (29 KB instead of 165 KB) from
+   public/fonts/Manrope.ttf with fontTools. The layout preloads it. For a
+   character outside that set, add it to the cut (or use an Icon) rather than
+   letting the browser search the device for another font. */
 @font-face {
   font-family: "Manrope";
-  src: url("/fonts/Manrope.ttf") format("truetype");
+  src: url("/fonts/manrope-latin-v1.woff2") format("woff2");
   font-weight: 200 800;
   font-display: swap;
 }
@@ -346,7 +350,9 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
 
 /* ---------- Loading screen ----------
    A ring of eight glossy beads that pop in one after another and out again,
-   with a 0-100 counter, shown once while the site first loads. */
+   with a 0-100 counter. Shown on the first page of a visit only (an inline
+   script in the layout marks later full loads as data-intro="seen"), and kept
+   short: it is gone 1.8s after the page arrives. */
 @property --pct { syntax: "<integer>"; initial-value: 0; inherits: false; }
 .intro {
   position: fixed;
@@ -360,8 +366,9 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
     radial-gradient(34rem 26rem at 50% 42%, rgb(19 111 99 / 0.32), transparent 70%),
     radial-gradient(30rem 24rem at 85% 100%, rgb(62 47 91 / 0.45), transparent 70%),
     #020a06;
-  animation: intro-out 0.8s cubic-bezier(0.76, 0, 0.24, 1) 2s forwards;
+  animation: intro-out 0.7s cubic-bezier(0.76, 0, 0.24, 1) 1.1s forwards;
 }
+html[data-intro="seen"] .intro { display: none; }
 .intro-ring { position: relative; width: 7rem; height: 7rem; }
 /* Each span is an arm turned to its place on the ring; its ::before is the bead. */
 .intro-ring span {
@@ -400,7 +407,7 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
   counter-reset: pct var(--pct);
-  animation: intro-count 1.9s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+  animation: intro-count 1.05s cubic-bezier(0.3, 0, 0.2, 1) forwards;
 }
 .intro-count::after { content: counter(pct) "%"; }
 @keyframes intro-count { to { --pct: 100; } }
@@ -426,7 +433,7 @@ button:hover .roll-inner, button:focus-visible .roll-inner { transform: translat
   background: var(--color-gold);
   transform-origin: left;
   transform: scaleX(0);
-  animation: intro-bar 1.9s cubic-bezier(0.3, 0, 0.2, 1) forwards;
+  animation: intro-bar 1.05s cubic-bezier(0.3, 0, 0.2, 1) forwards;
 }
 @keyframes intro-bar { to { transform: scaleX(1); } }
 @keyframes intro-out { to { transform: translateY(-100%); visibility: hidden; } }

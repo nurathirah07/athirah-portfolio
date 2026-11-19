@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Suspense } from "react";
 import ProjectIntro from "@/components/ProjectIntro";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
@@ -22,8 +21,13 @@ export async function generateMetadata({ params }: Props) {
   return { title: `${project?.title ?? "Project"} — ${site.name}`, description: project?.summary };
 }
 
-export default function ProjectPage({ params }: Props) {
-  return <Suspense>{params.then(({ slug }) => <Detail slug={slug} />)}</Suspense>;
+// Every project's address is listed above (generateStaticParams), so the page
+// reads it directly and is built whole ahead of time. (A <Suspense> around it
+// made the page arrive in two parts: the footer first, near the top, then the
+// project pushing it down.)
+export default async function ProjectPage({ params }: Props) {
+  const { slug } = await params;
+  return <Detail slug={slug} />;
 }
 
 // A neighbouring project: thumbnail, title and an arrow that slides on hover.

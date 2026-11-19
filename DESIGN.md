@@ -59,13 +59,14 @@ cards that stack or move while scrolling, like the Work stack), `.glass-dark` (n
 
 | Part | File | What it does / how to use it |
 |---|---|---|
-| Intro loader | `layout.tsx` + `.intro*` CSS | Beads + % counter, pure CSS, once per full load. Leave it |
-| Page transition | `components/Curtain.tsx` | A disc with a gold→flame rim grows from the click point, the route changes behind it, then the disc closes. State machine `idle → covering → revealing` (`data-phase`). Ease `[0.76,0,0.24,1]`, 0.6s |
+| Intro loader | `layout.tsx` + `.intro*` CSS | Beads + % counter, pure CSS. Only on the first page of a visit (`INTRO_ONCE` in the layout marks later full loads `data-intro="seen"`), gone 1.8s after the page arrives; `Hero` waits for it only then. Keep its look; don't lengthen it |
+| Page transition | `components/Curtain.tsx` | A disc with a gold→flame rim grows from the click point, the route changes behind it, then the disc closes. State machine `idle → covering → revealing` (`data-phase`). Ease `[0.76,0,0.24,1]`, 0.45s each way (about 1s per page change) |
 | Transition links | `components/TransitionLink.tsx` | **Every internal link must use this**, never plain `next/link`. It sends `curtain:go` with the click point |
 | Smooth scroll | `components/SmoothScroll.tsx`, `lib/scroll.ts` | Lenis on mouse/trackpad only (off on touch and reduced motion). Jump with `scrollToY(y, duration)`; stop the page scrolling under a full-screen panel with `lockScroll(true/false)`. Never use `window.scrollTo` directly |
 | Nav | `components/Nav.tsx` | Wide screens: glass pill with a sliding gold `layoutId="nav-pill"` and a "Let's talk" `btn-gloss`. Phones and tablets: the `Menu` button instead. Both: a gold→flame scroll progress bar and the header fading to a backdrop after 40px |
 | Menu | `components/Menu.tsx` | Below `md`: a menu button (two lines → ✕) opens a full-screen panel as a circle growing from the button; Home / About / Work / Contact rise in, the current page is gold, pointing at one dims the others. Machine `closed → opening → open → closing` (`data-phase` on `#site-menu`); locks scroll, keeps focus inside, closes on Esc and on page change |
 | Cursor | `components/Cursor.tsx` | Gold dot. Over `a, button` it grows to a ring; over `data-cursor="reveal"` it becomes an open ring; over `data-cursor-label="View"` it becomes a gold badge with that word. **Use the attributes; don't add listeners** |
+| Icons | `components/Icon.tsx` | Line icons in the text colour (`external`, `check`, `edit`, `close`). **Use these instead of typing a symbol the font lacks** (↗ ✓ ✎ ✕ and the like): those make the browser search the device for another font, which delays the first paint and stutters on first use. Manrope (cut to Latin + arrows, `public/fonts/manrope-latin-v1.woff2`) has ← → ↓ · – — … © × |
 | Magnetic | `components/Magnetic.tsx` | Wraps a button and pulls it toward the pointer (mouse only). `strength` defaults to 0.3 |
 | Roll text | `components/RollText.tsx` + `.roll` CSS | The label rolls up on hover and its copy comes in gold (`roll-plain` keeps the colour). Use it on every text link and button label |
 | Word rise | `components/RiseText.tsx` | Heading words rise from a mask when scrolled into view (stagger 0.07s, 0.85s). Don't use `accent` (see section 1) |

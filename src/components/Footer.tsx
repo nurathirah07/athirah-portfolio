@@ -4,6 +4,7 @@ import Magnetic from "@/components/Magnetic";
 import Reveal from "@/components/Reveal";
 import RiseText from "@/components/RiseText";
 import RollText from "@/components/RollText";
+import Icon from "@/components/Icon";
 import TransitionLink from "@/components/TransitionLink";
 import { site } from "@/data/site";
 import { scrollToY } from "@/lib/scroll";
@@ -59,7 +60,7 @@ export default function Footer() {
                   data-cursor-label={copied ? "Copied" : "Copy"}
                   className="rounded-full border border-cream/20 px-6 py-4 text-sm transition-colors duration-300 hover:border-gold hover:text-gold"
                 >
-                  <span aria-live="polite">{copied ? "Copied ✓" : site.email}</span>
+                  <span aria-live="polite">{copied ? <>Copied <Icon name="check" className="ml-0.5" /></> : site.email}</span>
                   {!copied && <span className="ml-3 font-accent text-[13px] text-cream/65">Copy</span>}
                 </button>
               </div>
@@ -81,11 +82,11 @@ export default function Footer() {
                 <ul className="mt-3">
                   {socials.map((s) => (
                     <li key={s.label}>
-                      <a href={s.href} target="_blank" rel="noreferrer" className="inline-block py-1.5 text-cream/80 hover:text-gold"><RollText>{`${s.label} ↗`}</RollText></a>
+                      <a href={s.href} target="_blank" rel="noreferrer" className="inline-block py-1.5 text-cream/80 hover:text-gold"><RollText>{s.label}</RollText><Icon name="external" className="ml-1" /></a>
                     </li>
                   ))}
                   <li>
-                    <a href={`mailto:${site.email}`} className="inline-block py-1.5 text-cream/80 hover:text-gold"><RollText>Email ↗</RollText></a>
+                    <a href={`mailto:${site.email}`} className="inline-block py-1.5 text-cream/80 hover:text-gold"><RollText>Email</RollText><Icon name="external" className="ml-1" /></a>
                   </li>
                   {site.links.resume && (
                     <li>
