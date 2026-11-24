@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import Glow from "@/components/Glow";
 import SmoothScroll from "@/components/SmoothScroll";
 import VisitNote from "@/components/VisitNote";
+import VisitTracker from "@/components/VisitTracker";
 import { site, siteUrl } from "@/data/site";
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Curtain />
         <SmoothScroll />
         <VisitNote />
+        <VisitTracker />
         <Glow />
         <Cursor />
         <Nav />

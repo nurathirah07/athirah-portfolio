@@ -9,6 +9,7 @@ import { scriptedTurn, type Said, type Turn } from "@/lib/miraBrain";
 import { conversation, type Phase, type PhaseEvent } from "@/lib/miraMachine";
 import { useCopy } from "@/lib/useCopy";
 import { useMachine } from "@/lib/useMachine";
+import { noteBrief } from "@/lib/visits/client";
 import { isSpeaking, wakeAudio, loudness, preload, speak, speechSeconds, stopSpeaking } from "@/lib/miraVoice";
 
 const TYPE_MS = 26; // per letter when a line has no recording
@@ -302,6 +303,8 @@ export default function Assistant() {
         }),
       });
       mira.send({ type: res.ok ? "DELIVERED" : "FAILED" });
+      // The admin's visitor log shows this visit under the name they gave.
+      if (res.ok) noteBrief(brief.name ?? "");
     } catch {
       mira.send({ type: "FAILED" });
     }

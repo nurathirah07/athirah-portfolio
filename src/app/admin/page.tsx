@@ -4,6 +4,7 @@ import { connection } from "next/server";
 import { adminEnabled, hasPassword, isSignedIn } from "@/lib/admin/auth";
 import { readProjects } from "@/lib/admin/store";
 import AdminEditor from "./AdminEditor";
+import AdminTabs from "./AdminTabs";
 import SignInForm from "./SignInForm";
 
 export const metadata = { title: "Admin", robots: { index: false, follow: false } };
@@ -35,5 +36,10 @@ async function Gate() {
   }
 
   if (!(await isSignedIn())) return <SignInForm />;
-  return <AdminEditor projects={await readProjects()} />;
+  return (
+    <>
+      <AdminTabs current="projects" />
+      <AdminEditor projects={await readProjects()} />
+    </>
+  );
 }

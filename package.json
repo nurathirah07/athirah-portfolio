@@ -13,6 +13,7 @@
     "test": "node --no-warnings --import ./scripts/test-setup.mjs --test \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "@upstash/redis": "^1.41.0",
     "kokoro-js": "^1.2.1",
     "lenis": "^1.3.27",
     "motion": "^14.10.1",

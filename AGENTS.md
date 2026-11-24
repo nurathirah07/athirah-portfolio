@@ -29,9 +29,13 @@ In browser tests, wait on these attributes (for Mira: `data-phase="asking"` and 
 
 When the reduced-motion setting changes **what is on the page** (a still image instead of a video, buttons that only exist with motion on), read it with `usePrefersStill` (`src/lib/usePrefersStill.ts`), not Motion's `useReducedMotion`. The server can't know the setting, so Motion's hook makes the first paint differ from the server's HTML and React redraws that part (React error #418). Motion's hook is still right for animation values and effects.
 
+## Visitor log
+
+The live site logs visits for Admin → Visitors (see DESIGN.md section 2). It needs `KV_REST_API_URL` and `KV_REST_API_TOKEN` (Upstash for Redis, connected in Vercel; copy them into `.env.local` for the admin). Without them nothing is recorded. `/api/visit` only records in production builds and never on `localhost`, so test the tracker through the machine's network address with `navigator.webdriver` hidden and a normal user agent.
+
 ## Checks
 
-- `npm test`: Mira's machines, question order and written replies, and that every line she says has a recording. No browser needed; run it after any change to `src/lib/mira*`, `src/lib/machine.ts` or `src/data/assistant.ts`.
+- `npm test`: Mira's machines, question order and written replies, that every line she says has a recording, the smaller machines, and the visitor log's wording and sums. No browser needed; run it after any change to `src/lib/mira*`, `src/lib/machine.ts` or `src/data/assistant.ts`.
 - `npm run voice`: records new or changed lines from `src/data/assistant.ts` in Mira's voice (also runs before `npm run dev`). A line without a recording is spoken in a fallback voice, and `npm test` fails.
 - `npx tsc --noEmit -p .` and `npx eslint src scripts` must both be clean.
 
