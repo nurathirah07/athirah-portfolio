@@ -18,16 +18,26 @@ const INDEX = "pf:visits";
 const metaKey = (id: string) => `pf:visit:${id}`;
 const eventsKey = (id: string) => `pf:events:${id}`;
 
-const url = () => process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
-const token = () => process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+// The database's address and key. Vercel names them KV_REST_API_URL and
+// KV_REST_API_TOKEN, with the prefix chosen when the database was connected in
+// front (e.g. STORAGE_KV_REST_API_URL); Upstash's own names work too.
+function settings() {
+  const env = process.env;
+  if (env.UPSTASH_REDIS_REST_URL && env.UPSTASH_REDIS_REST_TOKEN) return { url: env.UPSTASH_REDIS_REST_URL, token: env.UPSTASH_REDIS_REST_TOKEN };
+  for (const name of Object.keys(env).filter((n) => /(^|_)KV_REST_API_URL$/.test(n)).sort((a, b) => a.length - b.length)) {
+    const token = env[name.replace(/URL$/, "TOKEN")];
+    if (env[name] && token) return { url: env[name]!, token };
+  }
+  return null;
+}
 
 /** Whether the database's two settings are present. */
-export const visitsConnected = () => !!(url() && token());
+export const visitsConnected = () => settings() !== null;
 
 // Created on first use, not when the file loads, so building the site never needs the settings.
 let redis: Redis | null = null;
 function db() {
-  redis ??= new Redis({ url: url()!, token: token()! });
+  redis ??= new Redis(settings()!);
   return redis;
 }
 

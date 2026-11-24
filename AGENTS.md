@@ -31,7 +31,7 @@ When the reduced-motion setting changes **what is on the page** (a still image i
 
 ## Visitor log
 
-The live site logs visits for Admin → Visitors (see DESIGN.md section 2). It needs `KV_REST_API_URL` and `KV_REST_API_TOKEN` (Upstash for Redis, connected in Vercel; copy them into `.env.local` for the admin). Without them nothing is recorded. `/api/visit` only records in production builds and never on `localhost`, so test the tracker through the machine's network address with `navigator.webdriver` hidden and a normal user agent.
+The live site logs visits for Admin → Visitors (see DESIGN.md section 2). It needs Vercel's Upstash settings ending in `KV_REST_API_URL` and `KV_REST_API_TOKEN`, under any prefix (this project's are `STORAGE_KV_REST_API_URL` and `STORAGE_KV_REST_API_TOKEN`); copy them into `.env.local` for the admin. Without them nothing is recorded. `/api/visit` only records in production builds and never on `localhost`, so test the tracker through the machine's network address with `navigator.webdriver` hidden and a normal user agent.
 
 ## Checks
 

@@ -231,9 +231,9 @@ function ConnectGuide() {
         </li>
         <li>Redeploy the site (or push a change), so the live site picks up the new settings.</li>
         <li>
-          In the project&apos;s <span className="text-cream">Settings</span>, under <span className="text-cream">Environment Variables</span>, copy{" "}
-          <code className="text-gold">KV_REST_API_URL</code> and <code className="text-gold">KV_REST_API_TOKEN</code> into <code className="text-gold">.env.local</code>, then
-          restart <code className="text-gold">npm run dev</code>.
+          In the project&apos;s <span className="text-cream">Settings</span>, under <span className="text-cream">Environment Variables</span>, copy the two ending in{" "}
+          <code className="text-gold">KV_REST_API_URL</code> and <code className="text-gold">KV_REST_API_TOKEN</code> (they may start with a prefix such as{" "}
+          <code className="text-gold">STORAGE_</code>) into <code className="text-gold">.env.local</code>, then restart <code className="text-gold">npm run dev</code>.
         </li>
       </ol>
     </div>
