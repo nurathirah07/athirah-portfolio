@@ -16,6 +16,15 @@ const COUNT = "visit:count";
 const PAGE = "visit:page";
 const PENDING = "visit:pending";
 
+/** Marks this browser as yours (signing in to the admin does this). */
+export function markOwner() {
+  try {
+    localStorage.setItem(ME, "1");
+  } catch {
+    // storage blocked: nothing to remember
+  }
+}
+
 /** Reads ?me=1 / ?me=0 from the address and remembers it for this browser. */
 export function rememberOwner() {
   try {

@@ -31,7 +31,11 @@ When the reduced-motion setting changes **what is on the page** (a still image i
 
 ## Visitor log
 
-The live site logs visits for Admin → Visitors (see DESIGN.md section 2). It needs Vercel's Upstash settings ending in `KV_REST_API_URL` and `KV_REST_API_TOKEN`, under any prefix (this project's are `STORAGE_KV_REST_API_URL` and `STORAGE_KV_REST_API_TOKEN`); copy them into `.env.local` for the admin. Without them nothing is recorded. `/api/visit` only records in production builds and never on `localhost`, so test the tracker through the machine's network address with `navigator.webdriver` hidden and a normal user agent.
+The live site logs visits for Admin → Visitors (see DESIGN.md section 2). It needs Vercel's Upstash settings ending in `KV_REST_API_URL` and `KV_REST_API_TOKEN`, under any prefix (this project's are `STORAGE_KV_REST_API_URL` and `STORAGE_KV_REST_API_TOKEN`); copy them into `.env.local` for the admin. Without them nothing is recorded.
+
+The admin signs in wherever `ADMIN_PASSWORD` is set (at least 8 characters locally, 12 on the live site; without one the live site has no admin). On the live site only Admin → Visitors exists: the project editor and its save, delete and reorder actions need `npm run dev` (`editorEnabled` in `src/lib/admin/auth.ts`), because they write files. Sign-in allows 10 tries per 15 minutes per connection (`src/lib/admin/limit.ts`), and signing in marks that browser as the owner's so it isn't logged. `next start` also reads `.env.local`, so test "no password" with a too-short `ADMIN_PASSWORD` instead.
+
+`/api/visit` only records in production builds and never on `localhost`, so test the tracker through the machine's network address with `navigator.webdriver` hidden and a normal user agent.
 
 ## Checks
 

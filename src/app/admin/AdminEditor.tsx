@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { deviceOf, isPortrait, suggestPlatform, type Device, type Platform, type Project, type Shot } from "@/data/site";
 import { activity, type Activity, type ActivityEvent, type Task } from "@/lib/admin/activityMachine";
 import { useMachine } from "@/lib/useMachine";
-import { deleteProject, moveProject, saveProject, signOut, type FormState } from "./actions";
+import { deleteProject, moveProject, saveProject, type FormState } from "./actions";
 
 const NEW = "__new__";
 const blank: Project = { slug: "", title: "", year: String(new Date().getFullYear()), kind: "", summary: "", tech: [], shots: [], platform: "web" };
@@ -69,12 +69,7 @@ export default function AdminEditor({ projects }: { projects: Project[] }) {
   return (
     <div className="grid gap-8 lg:grid-cols-[18rem_1fr]" data-phase={now.name} data-task={task ?? undefined}>
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <div className="flex items-center justify-between">
-          <h1 className="font-display text-3xl">Projects</h1>
-          <form action={signOut}>
-            <button type="submit" className="font-accent text-[11px] text-cream/50 hover:text-flame">Sign out</button>
-          </form>
-        </div>
+        <h1 className="font-display text-3xl">Projects</h1>
         <p className="mt-2 text-xs text-cream/50">The order here is the order on the Work page.</p>
 
         <button

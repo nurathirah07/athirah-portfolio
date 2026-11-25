@@ -1,15 +1,21 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
-// The admin only exists while running `npm run dev` on your own computer.
-// Saving writes files into the project, which a published site can't do.
-export const adminEnabled = process.env.NODE_ENV !== "production";
+// Signing in works wherever ADMIN_PASSWORD is set: on your computer
+// (.env.local) and on the live site (the project's settings on Vercel), where
+// only the Visitors tab is available.
+// Editing projects only works on your computer (`npm run dev`): saving writes
+// files into the project, which the live site can't do.
+export const onLiveSite = process.env.NODE_ENV === "production";
+export const editorEnabled = !onLiveSite;
 
 const COOKIE = "admin_session";
 const MAX_AGE = 60 * 60 * 8; // 8 hours
 
 const password = () => process.env.ADMIN_PASSWORD ?? "";
-export const hasPassword = () => password().length >= 8;
+// The live site's sign-in page can be found by anyone, so its password must be longer.
+export const MIN_PASSWORD = onLiveSite ? 12 : 8;
+export const hasPassword = () => password().length >= MIN_PASSWORD;
 
 const digest = (value: string) => createHmac("sha256", "admin-compare").update(value).digest();
 const sign = (expires: number) => createHmac("sha256", password()).update(`admin:${expires}`).digest("hex");
@@ -24,6 +30,7 @@ export async function startSession() {
   (await cookies()).set(COOKIE, `${expires}.${sign(expires)}`, {
     httpOnly: true,
     sameSite: "strict",
+    secure: onLiveSite, // only ever sent over https on the live site
     path: "/",
     maxAge: MAX_AGE,
   });
@@ -33,8 +40,9 @@ export async function endSession() {
   (await cookies()).delete(COOKIE);
 }
 
+/** Whether this request comes from a signed-in admin. Changing the password signs everyone out. */
 export async function isSignedIn() {
-  if (!adminEnabled || !hasPassword()) return false;
+  if (!hasPassword()) return false;
   const value = (await cookies()).get(COOKIE)?.value;
   if (!value) return false;
   const [expiresText, signature] = value.split(".");

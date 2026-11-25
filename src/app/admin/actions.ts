@@ -1,6 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
-import { adminEnabled, endSession, isSignedIn, passwordMatches, startSession } from "@/lib/admin/auth";
+import { editorEnabled, endSession, hasPassword, isSignedIn, passwordMatches, startSession } from "@/lib/admin/auth";
+import { connectionKey, signInAllowed } from "@/lib/admin/limit";
 import { commitAdminChange, readProjects, removeUnusedUploads, removeUnusedVideos, savePoster, saveUpload, saveVideo, writeProjects } from "@/lib/admin/store";
 import { deviceOf, platforms, type Device, type Platform, type Project, type Reel, type Shot, type Story } from "@/data/site";
 
@@ -17,18 +18,22 @@ const MAX_SHOTS = 12;
 const MAX_STORY = 300; // characters per story line
 
 // Every action re-checks the session itself rather than trusting the page.
-async function requireAdmin() {
-  if (!adminEnabled || !(await isSignedIn())) throw new Error("Not signed in");
+// Saving, deleting and reordering also need your computer: they write files
+// into the project, so on the live site they refuse even when signed in.
+async function requireEditor() {
+  if (!editorEnabled || !(await isSignedIn())) throw new Error("Not signed in");
 }
 
 export async function signIn(_: FormState, form: FormData): Promise<FormState> {
-  if (!adminEnabled) return { error: "The admin only runs locally with npm run dev." };
+  if (!hasPassword()) return { error: "Set an admin password first." };
+  if (!(await signInAllowed(await connectionKey()))) return { error: "Too many tries. Wait 15 minutes, then try again." };
   if (!passwordMatches(String(form.get("password") ?? ""))) {
     await new Promise((r) => setTimeout(r, 700)); // slows down guessing
     return { error: "That password isn't right." };
   }
   await startSession();
-  redirect("/admin");
+  // On the live site only the visitor log is available.
+  redirect(editorEnabled ? "/admin" : "/admin/visitors");
 }
 
 export async function signOut() {
@@ -43,7 +48,7 @@ const upload = (form: FormData, key: string) => {
 };
 
 export async function saveProject(_: FormState, form: FormData): Promise<FormState> {
-  await requireAdmin();
+  await requireEditor();
   const projects = await readProjects();
   const originalSlug = text(form, "originalSlug");
   const existing = projects.find((p) => p.slug === originalSlug);
@@ -162,7 +167,7 @@ export async function saveProject(_: FormState, form: FormData): Promise<FormSta
 }
 
 export async function deleteProject(slug: string): Promise<FormState> {
-  await requireAdmin();
+  await requireEditor();
   const projects = await readProjects();
   const target = projects.find((p) => p.slug === slug);
   if (!target) return { error: "That project no longer exists." };
@@ -174,7 +179,7 @@ export async function deleteProject(slug: string): Promise<FormState> {
 }
 
 export async function moveProject(slug: string, direction: -1 | 1): Promise<FormState> {
-  await requireAdmin();
+  await requireEditor();
   const projects = await readProjects();
   const i = projects.findIndex((p) => p.slug === slug);
   const j = i + direction;

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { connection } from "next/server";
-import { adminEnabled, hasPassword, isSignedIn } from "@/lib/admin/auth";
+import { hasPassword, isSignedIn, onLiveSite } from "@/lib/admin/auth";
 import { readProjects } from "@/lib/admin/store";
 import { duration, pageName, type Visit } from "@/lib/visits/describe";
 import { KEEP_DAYS, readLog, visitsConnected } from "@/lib/visits/store";
@@ -14,7 +14,6 @@ export const metadata = { title: "Visitors", robots: { index: false, follow: fal
 type Props = { searchParams: Promise<{ show?: string }> };
 
 export default function VisitorsPage({ searchParams }: Props) {
-  if (!adminEnabled) notFound();
   return (
     <Suspense fallback={<p className="text-cream/60">Loading…</p>}>
       <Visitors searchParams={searchParams} />
@@ -48,7 +47,9 @@ function when(ms: number, now: number) {
 // Reads the log on every request, after checking the admin is signed in.
 async function Visitors({ searchParams }: Props) {
   await connection();
-  if (!hasPassword() || !(await isSignedIn())) redirect("/admin");
+  // Without a password the live site has no admin at all; otherwise, sign in first.
+  if (!hasPassword() && onLiveSite) notFound();
+  if (!(await isSignedIn())) redirect("/admin");
   const { show } = await searchParams;
   const count = Math.min(500, Math.max(50, Number(show) || 50));
 
@@ -209,8 +210,8 @@ function Tips() {
         resume&apos;s link ending in <code className="text-gold">?ref=cv</code> shows here as &quot;From cv&quot;.
       </p>
       <p className="mt-2">
-        <span className="text-cream/80">Leave yourself out:</span> open the live site once with <code className="text-gold">?me=1</code> at the end of the address on each
-        of your own phones and computers (<code className="text-gold">?me=0</code> undoes it).
+        <span className="text-cream/80">Leave yourself out:</span> signing in to this admin on a phone or computer leaves that browser out. For a browser
+        you don&apos;t sign in on, open the live site once with <code className="text-gold">?me=1</code> at the end of the address (<code className="text-gold">?me=0</code> undoes it).
       </p>
       <p className="mt-2">
         Names only appear when a visitor gives one to Mira. Browsers set to &quot;Do not track&quot; aren&apos;t logged.

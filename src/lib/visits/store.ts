@@ -41,13 +41,15 @@ function db() {
   return redis;
 }
 
-/** At most `perMinute` writes a minute from one connection, so nobody can flood the log. */
-export async function allowed(who: string, perMinute = 40) {
-  const slot = `pf:rate:${who}:${Math.floor(Date.now() / 60_000)}`;
-  const count = await db().incr(slot);
-  if (count === 1) await db().expire(slot, 120);
-  return count <= perMinute;
+/** Counts one more use of `key`; false once it has been used more than `limit` times in `windowSeconds`. */
+export async function withinLimit(key: string, limit: number, windowSeconds: number) {
+  const count = await db().incr(key);
+  if (count === 1) await db().expire(key, windowSeconds);
+  return count <= limit;
 }
+
+/** At most `perMinute` writes a minute from one connection, so nobody can flood the log. */
+export const allowed = (who: string, perMinute = 40) => withinLimit(`pf:rate:${who}:${Math.floor(Date.now() / 60_000)}`, perMinute, 120);
 
 async function append(id: string, event: VisitEvent) {
   const p = db().pipeline();
